@@ -1,0 +1,1486 @@
+Dev Post Description:
+
+Welcome to the Yelp AI API Hackathon!
+
+Build the Future of Local Discovery with AI
+
+Join us for an exciting opportunity to revolutionize how people discover and interact with local businesses! The Yelp AI API Hackathon challenges developers to create innovative web or mobile applications powered by Yelp's cutting-edge AI API as the primary data source.
+ 
+
+This hackathon puts Yelp's powerful AI-driven local business data directly in your hands. You'll have access to comprehensive information about restaurants, services, and businesses worldwide, enhanced by conversational AI capabilities to create truly unique user experiences. Whether you're building a personalized dining recommendation engine, a smart travel companion, or an innovative business discovery tool, the possibilities are endless.
+
+Using new agentic action capabilties, Yelp's AI API supports conversational restaurant reservations at thounsads of locations across the US & Canada. You can try the AI API Playground here (Yelp account required).
+
+ 
+
+The Challenge
+
+Create a NEW, fully functional application that leverages Yelp AI API's capabilities. Your project will be judged equally on technological implementation, design excellence, potential impact, and creative innovation. Top submissions will compete for $5,000 in total prizes, and exclusive rights to use the Yelp Hackathon Winner badge.
+
+PLEASE NOTE: We have now confirmed all judges for this event, we appreciate your interest in becoming a judge for this hackathon however applications for this role will not be considered
+Requirements
+What to Build
+The only limit is your imagination. Design intelligent dining experiences like AI-powered meal planners that suggest restaurants based on dietary preferences and cuisine exploration goals. Create nightlife guides that match users with venues based on music taste, atmosphere, and real-time crowd insights. Build smart home service platforms connecting homeowners with trusted contractors through AI-driven matching. Develop travel companions that craft personalized itineraries blending food, activities, and hidden gems. Think beyond search ro consider voice-activated assistants, AR experiences overlaying business info on city streets, or social platforms for sharing local recommendations. Your app should make discovering and experiencing local businesses more intuitive, personalized, and delightful than ever before.
+
+What to Submit
+Your submission must include a NEW web or mobile application using Yelp AI API endpoint as the primary data source, with a public code repository containing all source code and setup instructions. Provide a URL to a hosted build (APK/TestFlight) or published app for testing. Include a three-minute demonstration video (YouTube, Vimeo, or similar) showing your app in action, plus a detailed text description explaining features and functionality. Enter your Yelp AI API client ID generated during sign-up. Ensure your project meets technical requirements: thoroughly leverages Yelp AI API, functions as demonstrated, and represents original work created during the submission period
+
+Yelp AI API Documentation:
+
+Yelp AI API (Search & Chat)
+post
+https://api.yelp.com/ai/chat/v2
+
+The Yelp AI API endpoint brings conversational intelligence to your applications, enabling users to ask natural language questions and receive real-time, contextually relevant answers powered by Yelp’s latest business data and reviews.
+
+Yelp AI API Features
+
+Next generation search & discovery - Search with natural language, discover, and connect with contextually relevant businesses.
+Multi-turn conversations - Support back-and-forth interactions and refine queries with follow-up questions.
+Direct business queries - Ask targeted questions about businesses without needing to perform a prior search.
+Conversational restaurant reservations - Explore availability and book a table at restaurants through natural language interactions. (Please note that this feature is available on request only. To enable reservations, please contact us.)
+Instant quotes for home services - Simply describe the service you need (like “I need quotes for fixing a leaking faucet”), and Yelp AI API instantly connects you with top local pros, so you receive multiple quotes from the best professionals for your job. (Currently in beta and not yet publicly available.)
+🚀 Try it now - Test Yelp AI API for free in our playground and see real-time responses in action.
+
+🛠️ For a detailed, step-by-step guide on integrating this endpoint into your application, check out the Getting Started with Yelp AI API guide.
+
+cURL request
+
+curl --request POST \
+     --url https://api.yelp.com/ai/chat/v2 \
+     --header 'accept: application/json' \
+     --header 'content-type: application/json' \
+     --data '
+{
+  "request_context": {
+    "skip_text_generation": false
+  }
+}
+'
+Response
+Click Try It! to start a request and see the response here! Or choose an example:
+application/json
+
+200 - Find Pizza places in Chicago
+
+200 - Compare Sumo Sushi and ITs SUSHI in Las Vegas
+
+200 - Find me reservation for 2 people at Tuscany Steakhouse for July 12, 2025 at 7:00 PM
+
+400 - Invalid Request
+
+401 - Unauthorized
+
+401 - Invalid Token
+
+403 - Authorization Error
+
+404 - Resource Not Found
+
+413 - Payload Too Large
+
+429 - Rate limited
+
+500 - Internal Server Error
+
+503 - Service Unavailable
+
+Body Params
+query
+string
+required
+length ≤ 1000
+• Natural language text for querying Yelp-specific information.
+• Accepts any prompt related to Yelp businesses, such as “Can you find a Thai restaurant near me?”
+• This should be plain text (no special formatting needed).
+
+chat_id
+string
+• Uniquely identifies the current conversation (chat session).
+• For the first request, set this to null or omit it; the API will respond with a new chat_id.
+• Use the returned chat_id on subsequent requests to continue the same conversation.
+• If omitted on subsequent requests, a new conversation is started.
+• If an invalid chat_id is provided, the request will fail.
+
+user_context
+object
+Contains optional location data (latitude and longitude) that can help the AI
+tailor results to a user’s location. If not provided and a location-based query
+is asked, the system may prompt the user to specify a location.
+
+
+user_context object
+latitude
+float
+-3.402823669209385e+38 to 3.402823669209385e+38
+• User’s approximate latitude.
+• If provided, it helps return more location-specific results.
+• Otherwise, the system may ask for location details if needed (e.g., for searches).
+
+longitude
+float
+-3.402823669209385e+38 to 3.402823669209385e+38
+• User's approximate longitude.
+• If provided, it helps return more location-specific results.
+• Otherwise, the system may ask for location details if needed.
+
+request_context
+object
+Contains optional settings that control how the API processes the request.
+These settings affect the response format and content generation behavior.
+
+
+request_context object
+skip_text_generation
+boolean
+Defaults to false
+• When set to true, skips LLM text generation and returns only structured data.
+• The response will contain empty text and tags, but all structured data
+(businesses, entities, types) will still be returned.
+• Useful for clients that only need structured data and want to reduce latency.
+
+
+false
+Responses
+
+200
+A successful response
+
+
+400
+Bad Request. Message varies depending on failure scenario
+
+
+401
+The API key has either expired or doesn't have the required scopes to query this endpoint.
+
+code	description
+UNAUTHORIZED_API_KEY	The API key provided is not currently able to query this endpoint.
+TOKEN_INVALID	Invalid API key or authorization header.
+
+403
+The API key provided is not currently able to query this endpoint.
+
+
+404
+Resource Not Found
+
+
+413
+The length of the request exceeded the maximum allowed
+
+
+429
+You have either exceeded your daily quota, or have exceeded the queries-per-second limit for this endpoint. Try reducing the rate at which you make queries.
+
+
+500
+Internal Server Error
+
+
+503
+Service Unavailable
+
+Getting Started with Yelp AI API
+This guide will walk you through the steps needed to integrate the Yelp AI API API into your application, leveraging best practices for a smooth developer experience. We will cover how to make your first API endpoint request, receive a response, and how to manage session state across subsequent requests.
+
+Introduction
+The Yelp AI API enables developers to build conversational experiences for local business discovery. Whether you're developing a chatbot, integrating into voice assistants or enhancing your app with smart local business recommendations, Yelp AI API provides flexible and power capabilities. The API takes in natural language inquiries and provides natural language responses along with structured data for additional context (e.g., location-based search results & business details).
+
+Prerequisites
+Before you start, ensure you have the following:
+
+A Yelp Places API account, and an API key for authentication. Refer to Yelp Places Authentication for further details.
+Basic knowledge of HTTP requests and JSON.
+A development environment (such as curl, Postman, or a client library in your preferred programming language) to send HTTP requests.
+Making Your First API Request
+Your first request does not need to include a chat_id. You can simply send a payload similar to the one below. The API endpoint will handle the conversation state internally and return a chat_id in the response, which you can use in subsequent calls for that user session.
+
+Example Request (first request):
+
+json
+
+POST https://api.yelp.com/ai/chat/v2
+Authorization: Bearer <Your API Key>
+Content-Type: application/json
+
+{
+  "query": "What's a good vegan pizza place near me?",
+  "user_context": {
+    "locale": "en_US",
+    "latitude": 40.7128,
+    "longitude": -74.0060
+  }
+}
+Explanation
+query: The user’s natural-language request or query.
+user_context: Optional but highly recommended context, such as the user’s locale and/or location coordinates.
+A successful response includes the AI’s textual output and may also contain structured data relevant to the response. Below is an example showing a typical response with business recommendations:
+
+JSON
+
+{
+    "response": {
+        "text": "I found a few great vegan pizza options nearby. Double Zero is a fully vegan pizzeria with cashew cheese and truffle pizzas and a trendy vibe. Norm's Pizza offers naturally leavened dough and classic NY-style slices, while Underground Pizza features gluten-free and keto options with a crispy thin crust. Double Zero is 100% plant-based, while the others have vegan-friendly choices.",
+        "tags": [
+            {
+                "tag_type": "business",
+                "start": 48,
+                "end": 59,
+                "meta": {
+                    "business_id": "EBK0OkVMBg_n_KxAU_4DZg"
+                }
+            },
+            {
+                "tag_type": "highlight",
+                "start": 91,
+                "end": 123
+            },
+            {
+                "tag_type": "business",
+                "start": 143,
+                "end": 155,
+                "meta": {
+                    "business_id": "Qr9FJkZAzav9px3xsEf1yQ"
+                }
+            },
+            {
+                "tag_type": "highlight",
+                "start": 163,
+                "end": 187
+            },
+            {
+                "tag_type": "business",
+                "start": 223,
+                "end": 240,
+                "meta": {
+                    "business_id": "B1XdGwZZ5ee2fBdngj7NUw"
+                }
+            },
+            {
+                "tag_type": "highlight",
+                "start": 250,
+                "end": 278
+            }
+        ]
+    },
+    "types": [
+        "business_search"
+    ],
+    "entities": [
+        {
+            "businesses": [
+                {
+                    "id": "Qr9FJkZAzav9px3xsEf1yQ",
+                    "alias": "norms-pizza-new-york",
+                    "name": "Norm's Pizza",
+                    "url": "https://www.yelp.com/biz/norms-pizza-new-york?adjust_creative=uKZbO3XxGEy7Htt5nSGiRw&utm_campaign=yelp_api_v3&utm_medium=api_v3_public_ai_api_chat_v2&utm_source=uKZbO3XxGEy7Htt5nSGiRw",
+                    "location": {
+                        "address1": "8 Cortlandt St",
+                        "address2": null,
+                        "address3": "",
+                        "city": "New York",
+                        "zip_code": null,
+                        "state": "NY",
+                        "country": "US",
+                        "formatted_address": "8 Cortlandt St\nNew York, NY 10007"
+                    },
+                    "coordinates": {
+                        "latitude": 40.71008448698627,
+                        "longitude": -74.0103149
+                    },
+                    "review_count": 41,
+                    "price": null,
+                    "rating": 4.6,
+                    "categories": [
+                        {
+                            "alias": "pizza",
+                            "title": "Pizza"
+                        }
+                    ],
+                    "attributes": {
+                        "BusinessUrl": "http://www.normspizza.com",
+                        "AboutThisBizBioPhotoDict": null,
+                        "AboutThisBizBusinessRecommendation": [],
+                        "BusinessAddressAlternate": null,
+                        "BusinessCategorySic": null,
+                        "BusinessMovedFrom": null,
+                        "BusinessNameAlternate": null,
+                        "BusinessOpeningDate": null,
+                        "BusinessTempClosed": null,
+                        "GroupName": null,
+                        "StoreCode": null,
+                        "AboutThisBizBio": null,
+                        "AboutThisBizBioFirstName": null,
+                        "AboutThisBizBioLastName": null,
+                        "AboutThisBizHistory": null,
+                        "AboutThisBizRole": null,
+                        "AboutThisBizSpecialties": "Norm\u2019s is a straight-up, no-frills pizza parlor. Heavy on the nostalgia and low on the BS, this is classic Brooklyn pizza for the people. We use only the highest quality ingredients, and we utilize the centuries-old technique of natural leavening to make our dough. At Norm\u2019s, there\u2019s a slice for you.",
+                        "AboutThisBizYearEstablished": null,
+                        "Alcohol": "none",
+                        "Ambience": null,
+                        "BikeParking": null,
+                        "BusinessAcceptsAndroidPay": null,
+                        "BusinessAcceptsApplePay": null,
+                        "BusinessAcceptsBitcoin": null,
+                        "BusinessAcceptsCreditCards": true,
+                        "BusinessDisplayUrl": null,
+                        "BusinessMovedTo": null,
+                        "BusinessParking": {
+                            "valet": false,
+                            "garage": false,
+                            "street": false,
+                            "lot": false,
+                            "validated": true
+                        },
+                        "BYOB": false,
+                        "BYOBCorkage": null,
+                        "Caters": true,
+                        "Corkage": null,
+                        "DogsAllowed": null,
+                        "DriveThru": null,
+                        "FlowerDelivery": null,
+                        "GenderNeutralRestrooms": null,
+                        "GoodForKids": null,
+                        "GoodForMeal": null,
+                        "HappyHour": null,
+                        "HasTV": false,
+                        "MenuUrl": "https://normspizza.com/welcome#menu-home",
+                        "NationalProviderIdentifier": null,
+                        "NoiseLevel": null,
+                        "OffersMilitaryDiscount": null,
+                        "OngoingVigilanteEvent": null,
+                        "OnlineReservations": null,
+                        "Open24Hours": null,
+                        "BusinessOpenToAll": null,
+                        "PlatformDelivery": null,
+                        "PokestopNearby": null,
+                        "RestaurantsCounterService": null,
+                        "RestaurantsDelivery": true,
+                        "RestaurantsGoodForGroups": null,
+                        "RestaurantsPriceRange": null,
+                        "RestaurantsPriceRange2": null,
+                        "RestaurantsReservations": null,
+                        "RestaurantsTableService": null,
+                        "RestaurantsTakeOut": true,
+                        "WaitlistReservation": null,
+                        "WheelchairAccessible": true,
+                        "WiFi": null,
+                        "biz_summary": {
+                            "summary": "NY-style pizza with chewy crust near the World Trade Center Memorial.",
+                            "is_inactive": false,
+                            "allows_auto_summary_generation": true,
+                            "eligible_reviews_considered": 30
+                        },
+                        "biz_summary_long": {
+                            "summary": "Classic pizza parlor with a 1960s-inspired design offering prepared slices in Downtown Brooklyn. Norm's Pizza uses naturally leavened dough and high-quality ingredients, baked in high-temperature electric ovens. The menu features a variety of pies, including the distinctive vodka sauce pizza and avant garlic slice, with limited standing tables available for dining.",
+                            "is_inactive": false,
+                            "allows_auto_summary_generation": true,
+                            "eligible_reviews_considered": 17
+                        }
+                    },
+                    "phone": "+16466492692",
+                    "summaries": {
+                        "short": "NY-style pizza with chewy crust near the World Trade Center Memorial.",
+                        "medium": "Classic pizza parlor with a 1960s-inspired design offering prepared slices in Downtown Brooklyn. Norm's Pizza uses naturally leavened dough and high-quality ingredients, baked in high-temperature electric ovens.",
+                        "long": "Classic pizza parlor with a 1960s-inspired design offering prepared slices in Downtown Brooklyn. Norm's Pizza uses naturally leavened dough and high-quality ingredients, baked in high-temperature electric ovens. The menu features a variety of pies, including the distinctive vodka sauce pizza and avant garlic slice, with limited standing tables available for dining."
+                    },
+                    "contextual_info": {
+                        "summary": null,
+                        "review_snippets": [],
+                        "business_hours": [],
+                        "photos": [
+                            {
+                                "original_url": "https://s3-media0.fl.yelpcdn.com/bphoto/fQmKa1TxZlIudVp_CS84hw/o.jpg"
+                            },
+                            {
+                                "original_url": "https://s3-media0.fl.yelpcdn.com/bphoto/w0PxbS84It-NhZMLEUrCIA/o.jpg"
+                            },
+                            {
+                                "original_url": "https://s3-media0.fl.yelpcdn.com/bphoto/rJoupHXh7UuM2r4t2jxAIw/o.jpg"
+                            }
+                        ],
+                        "review_snippet": "Great [[HIGHLIGHT]]pizza[[ENDHIGHLIGHT]]! Nice thin crispy crust.. pizza doesn't have any flop which I sort of like in my NY..."
+                    }
+                },
+                {
+                    "id": "EBK0OkVMBg_n_KxAU_4DZg",
+                    "alias": "double-zero-new-york-5",
+                    "name": "Double Zero",
+                    "url": "https://www.yelp.com/biz/double-zero-new-york-5?adjust_creative=uKZbO3XxGEy7Htt5nSGiRw&utm_campaign=yelp_api_v3&utm_medium=api_v3_public_ai_api_chat_v2&utm_source=uKZbO3XxGEy7Htt5nSGiRw",
+                    "location": {
+                        "address1": "65 2nd Ave",
+                        "address2": "",
+                        "address3": "",
+                        "city": "New York",
+                        "zip_code": null,
+                        "state": "NY",
+                        "country": "US",
+                        "formatted_address": "65 2nd Ave\nNew York, NY 10003"
+                    },
+                    "coordinates": {
+                        "latitude": 40.7260895,
+                        "longitude": -73.9897998
+                    },
+                    "review_count": 662,
+                    "price": "$$",
+                    "rating": 4.3,
+                    "categories": [
+                        {
+                            "alias": "pizza",
+                            "title": "Pizza"
+                        },
+                        {
+                            "alias": "italian",
+                            "title": "Italian"
+                        }
+                    ],
+                    "attributes": {
+                        "BusinessAcceptsApplePay": false,
+                        "GenderNeutralRestrooms": true,
+                        "PokestopNearby": true,
+                        "BusinessUrl": "https://www.matthewkenneycuisine.com/double-zero",
+                        "AboutThisBizBioPhotoDict": null,
+                        "AboutThisBizBusinessRecommendation": [],
+                        "BusinessAddressAlternate": null,
+                        "BusinessCategorySic": null,
+                        "BusinessMovedFrom": null,
+                        "BusinessNameAlternate": null,
+                        "BusinessOpeningDate": null,
+                        "BusinessTempClosed": null,
+                        "GroupName": null,
+                        "StoreCode": null,
+                        "AboutThisBizBio": null,
+                        "AboutThisBizBioFirstName": null,
+                        "AboutThisBizBioLastName": null,
+                        "AboutThisBizHistory": null,
+                        "AboutThisBizRole": null,
+                        "AboutThisBizSpecialties": null,
+                        "AboutThisBizYearEstablished": null,
+                        "Alcohol": "full_bar",
+                        "Ambience": {
+                            "divey": false,
+                            "hipster": null,
+                            "casual": null,
+                            "touristy": false,
+                            "trendy": true,
+                            "intimate": null,
+                            "romantic": null,
+                            "classy": null,
+                            "upscale": null
+                        },
+                        "BikeParking": true,
+                        "BusinessAcceptsAndroidPay": null,
+                        "BusinessAcceptsBitcoin": false,
+                        "BusinessAcceptsCreditCards": true,
+                        "BusinessDisplayUrl": "",
+                        "BusinessMovedTo": null,
+                        "BusinessParking": {
+                            "garage": false,
+                            "street": true,
+                            "validated": false,
+                            "lot": false,
+                            "valet": false
+                        },
+                        "BYOB": false,
+                        "BYOBCorkage": null,
+                        "Caters": true,
+                        "Corkage": false,
+                        "DogsAllowed": true,
+                        "DriveThru": null,
+                        "FlowerDelivery": null,
+                        "GoodForKids": false,
+                        "GoodForMeal": {
+                            "dessert": null,
+                            "latenight": false,
+                            "lunch": null,
+                            "dinner": true,
+                            "brunch": false,
+                            "breakfast": false
+                        },
+                        "HappyHour": false,
+                        "HasTV": false,
+                        "MenuUrl": "",
+                        "NationalProviderIdentifier": null,
+                        "NoiseLevel": "average",
+                        "OffersMilitaryDiscount": null,
+                        "OngoingVigilanteEvent": null,
+                        "OnlineReservations": null,
+                        "Open24Hours": null,
+                        "BusinessOpenToAll": null,
+                        "PlatformDelivery": null,
+                        "RestaurantsAttire": "casual",
+                        "RestaurantsCounterService": null,
+                        "RestaurantsDelivery": true,
+                        "RestaurantsGoodForGroups": true,
+                        "RestaurantsPriceRange": null,
+                        "RestaurantsPriceRange2": 2,
+                        "RestaurantsReservations": true,
+                        "RestaurantsTableService": true,
+                        "RestaurantsTakeOut": true,
+                        "WaitlistReservation": null,
+                        "WheelchairAccessible": true,
+                        "WiFi": "free",
+                        "biz_summary_long": {
+                            "summary": "Vegan Italian restaurant with indoor seating offering a casual ambiance and outdoor seating with a street view. The menu includes a diverse selection of pizzas, pastas, and small plates, all crafted with plant-based ingredients. The establishment features a thin, crispy crust and creative toppings like truffle mushrooms and cashew cheese. The restaurant caters to both vegans and non-vegans, with gluten-free options and accommodating service.",
+                            "is_inactive": false,
+                            "allows_auto_summary_generation": true,
+                            "eligible_reviews_considered": 49
+                        },
+                        "biz_summary": {
+                            "summary": "Vegan pizzeria with a wood-burning oven offering cashew cheese and truffle pizzas.",
+                            "is_inactive": false,
+                            "allows_auto_summary_generation": true,
+                            "eligible_reviews_considered": 30
+                        }
+                    },
+                    "phone": "+12127771608",
+                    "summaries": {
+                        "short": "Vegan pizzeria with a wood-burning oven offering cashew cheese and truffle pizzas.",
+                        "medium": "Vegan Italian restaurant with indoor seating offering a casual ambiance and outdoor seating with a street view. The menu includes a diverse selection of pizzas, pastas, and small plates, all crafted with plant-based ingredients. The establishment features a thin, crispy crust and creative toppings like truffle mushrooms and cashew cheese.",
+                        "long": "Vegan Italian restaurant with indoor seating offering a casual ambiance and outdoor seating with a street view. The menu includes a diverse selection of pizzas, pastas, and small plates, all crafted with plant-based ingredients. The establishment features a thin, crispy crust and creative toppings like truffle mushrooms and cashew cheese. The restaurant caters to both vegans and non-vegans, with gluten-free options and accommodating service."
+                    },
+                    "contextual_info": {
+                        "summary": null,
+                        "review_snippets": [],
+                        "business_hours": [],
+                        "photos": [
+                            {
+                                "original_url": "https://s3-media0.fl.yelpcdn.com/bphoto/Aea3haoOsIyHF__Lksp7hQ/o.jpg"
+                            },
+                            {
+                                "original_url": "https://s3-media0.fl.yelpcdn.com/bphoto/7L5UHRZUUA0tMDuFglEWqA/o.jpg"
+                            },
+                            {
+                                "original_url": "https://s3-media0.fl.yelpcdn.com/bphoto/VZ8E_RSMCy3GYgBZmW65Fw/o.jpg"
+                            }
+                        ],
+                        "review_snippet": "I wouldnt come back since i prefer non [[HIGHLIGHT]]vegan pizza[[ENDHIGHLIGHT]] but the service and ambiance is good and it..."
+                    }
+                },
+                {
+                    "id": "B1XdGwZZ5ee2fBdngj7NUw",
+                    "alias": "underground-pizza-new-york",
+                    "name": "Underground Pizza",
+                    "url": "https://www.yelp.com/biz/underground-pizza-new-york?adjust_creative=uKZbO3XxGEy7Htt5nSGiRw&utm_campaign=yelp_api_v3&utm_medium=api_v3_public_ai_api_chat_v2&utm_source=uKZbO3XxGEy7Htt5nSGiRw",
+                    "location": {
+                        "address1": "3 Hanover Sq",
+                        "address2": "",
+                        "address3": "",
+                        "city": "New York",
+                        "zip_code": null,
+                        "state": "NY",
+                        "country": "US",
+                        "formatted_address": "3 Hanover Sq\nNew York, NY 10004"
+                    },
+                    "coordinates": {
+                        "latitude": 40.7048741,
+                        "longitude": -74.0095469
+                    },
+                    "review_count": 361,
+                    "price": "$",
+                    "rating": 4.1,
+                    "categories": [
+                        {
+                            "alias": "pizza",
+                            "title": "Pizza"
+                        },
+                        {
+                            "alias": "italian",
+                            "title": "Italian"
+                        }
+                    ],
+                    "attributes": {
+                        "BusinessAcceptsAndroidPay": false,
+                        "BusinessAcceptsApplePay": false,
+                        "GenderNeutralRestrooms": true,
+                        "BusinessUrl": "https://www.undergroundpizzanyny.com",
+                        "AboutThisBizBioPhotoDict": null,
+                        "AboutThisBizBusinessRecommendation": [],
+                        "BusinessAddressAlternate": null,
+                        "BusinessCategorySic": null,
+                        "BusinessMovedFrom": null,
+                        "BusinessNameAlternate": null,
+                        "BusinessOpeningDate": null,
+                        "BusinessTempClosed": null,
+                        "GroupName": null,
+                        "StoreCode": null,
+                        "AboutThisBizBio": null,
+                        "AboutThisBizBioFirstName": null,
+                        "AboutThisBizBioLastName": null,
+                        "AboutThisBizHistory": null,
+                        "AboutThisBizRole": null,
+                        "AboutThisBizSpecialties": null,
+                        "AboutThisBizYearEstablished": null,
+                        "Alcohol": "none",
+                        "Ambience": {
+                            "touristy": false,
+                            "hipster": false,
+                            "romantic": false,
+                            "divey": null,
+                            "intimate": false,
+                            "trendy": false,
+                            "upscale": false,
+                            "classy": false,
+                            "casual": true
+                        },
+                        "BikeParking": true,
+                        "BusinessAcceptsBitcoin": null,
+                        "BusinessAcceptsCreditCards": true,
+                        "BusinessDisplayUrl": null,
+                        "BusinessMovedTo": null,
+                        "BusinessParking": {
+                            "valet": false,
+                            "garage": false,
+                            "street": true,
+                            "lot": false,
+                            "validated": false
+                        },
+                        "BYOB": null,
+                        "BYOBCorkage": "no",
+                        "Caters": true,
+                        "Corkage": null,
+                        "DogsAllowed": null,
+                        "DriveThru": null,
+                        "FlowerDelivery": null,
+                        "GoodForKids": true,
+                        "GoodForMeal": {
+                            "dessert": false,
+                            "latenight": false,
+                            "lunch": true,
+                            "dinner": true,
+                            "brunch": false,
+                            "breakfast": false
+                        },
+                        "HappyHour": null,
+                        "HasTV": true,
+                        "MenuUrl": "https://undergroundpizzanyny.com/menu",
+                        "NationalProviderIdentifier": null,
+                        "NoiseLevel": "average",
+                        "OffersMilitaryDiscount": null,
+                        "OngoingVigilanteEvent": null,
+                        "OnlineReservations": null,
+                        "Open24Hours": null,
+                        "BusinessOpenToAll": null,
+                        "PlatformDelivery": null,
+                        "PokestopNearby": null,
+                        "RestaurantsAttire": "casual",
+                        "RestaurantsCounterService": null,
+                        "RestaurantsDelivery": true,
+                        "RestaurantsGoodForGroups": true,
+                        "RestaurantsPriceRange": null,
+                        "RestaurantsPriceRange2": 1,
+                        "RestaurantsReservations": false,
+                        "RestaurantsTableService": null,
+                        "RestaurantsTakeOut": true,
+                        "WaitlistReservation": null,
+                        "WheelchairAccessible": null,
+                        "WiFi": "no",
+                        "biz_summary_long": {
+                            "summary": "Authentic pizzeria with a diverse menu focusing on traditional and specialty pizzas, including gluten-free and keto options with cauliflower crust. Notable dishes include the Shrimp Parmigiana with Pasta Lunch Special and the Grandma Pizza. The establishment features a compact dining area with retro decor. Customers can enjoy quick service and a variety of lunch specials, making it a convenient spot for a satisfying meal.",
+                            "is_inactive": false,
+                            "allows_auto_summary_generation": true,
+                            "eligible_reviews_considered": 26
+                        },
+                        "biz_summary": {
+                            "summary": "New York-style pizza known for Grandma's pizza and crispy thin crust.",
+                            "is_inactive": false,
+                            "allows_auto_summary_generation": true,
+                            "eligible_reviews_considered": 23
+                        }
+                    },
+                    "phone": "+12124254442",
+                    "summaries": {
+                        "short": "New York-style pizza known for Grandma's pizza and crispy thin crust.",
+                        "medium": "Authentic pizzeria with a diverse menu focusing on traditional and specialty pizzas, including gluten-free and keto options with cauliflower crust. Notable dishes include the Shrimp Parmigiana with Pasta Lunch Special and the Grandma Pizza. The establishment features a compact dining area with retro decor.",
+                        "long": "Authentic pizzeria with a diverse menu focusing on traditional and specialty pizzas, including gluten-free and keto options with cauliflower crust. Notable dishes include the Shrimp Parmigiana with Pasta Lunch Special and the Grandma Pizza. The establishment features a compact dining area with retro decor. Customers can enjoy quick service and a variety of lunch specials, making it a convenient spot for a satisfying meal."
+                    },
+                    "contextual_info": {
+                        "summary": null,
+                        "review_snippets": [],
+                        "business_hours": [],
+                        "photos": [
+                            {
+                                "original_url": "https://s3-media0.fl.yelpcdn.com/bphoto/a6P1kw34CNDT49Vq5TmyDA/o.jpg"
+                            },
+                            {
+                                "original_url": "https://s3-media0.fl.yelpcdn.com/bphoto/C-__uEe2mlqP3HlecTM9FQ/o.jpg"
+                            },
+                            {
+                                "original_url": "https://s3-media0.fl.yelpcdn.com/bphoto/4j1ApbUt8Un2E05eoyH46A/o.jpg"
+                            }
+                        ],
+                        "review_snippet": "Maybe because I've been raised in NJ and gotten my fair share of \"NY Style [[HIGHLIGHT]]Pizzas[[ENDHIGHLIGHT]]\" and \"big-box..."
+                    }
+                }
+            ]
+        }
+    ],
+    "chat_id": "7ac95mkCJBR9WVPfpf3R_w"
+}
+Important Fields
+response.text: The AI’s primary response in natural language.
+types: Contextual tags indicating the nature of the response (here, "business_search").
+entities: Structured data containing relevant entities. In the example, this includes an array of businesses.
+contextual_info.summary: A contextually relevant, AI-generated summary of the business based on the user's query.
+summaries: Provides different levels of detail about the business, including a short, medium, and long description. This allows developers to choose the appropriate level of detail depending on their use case, such as quick previews for chatbots or full descriptions for business profiles.
+review_snippet: A highlighted snippet from a user review.
+chat_id: The identifier for your conversation. Use this in further requests to continue the same conversation context.
+Visit the Yelp AI API Reference page for detailed information on the fields returned by the API endpoint.
+
+
+Example 2: Business Question and Response
+After you complete your first request, the response’s chat_id should be included in each subsequent request for that user's session. This helps the Yelp AI API maintain context and continuity across multiple queries.
+
+Example Request (subsequent requests):
+
+JSON
+
+POST https://api.yelp.com/ai/chat/v2
+Authorization: Bearer <Your API Key>
+Content-Type: application/json
+
+{
+  "query": "What are their opening hours?",
+  "chat_id": "qs_MyS18PQJms3p5xdeVpQ"
+}
+Providing the chat_id into your requests ensures the AI knows you're continuing the same conversation. This way, the system can provide an informed response based on your prior interactions.
+
+Example Response:
+
+JSON
+
+{
+    "response": {
+        "text": "Double Zero is open daily from 12:00 PM to 11:00 PM (Friday and Saturday until 1:00 AM). Norm's Pizza is open Monday to Saturday 10:00 AM to 10:00 PM and Sunday 11:00 AM to 9:00 PM. Underground Pizza is open Monday to Friday 9:00 AM to 9:00 PM and Saturday 10:00 AM to 8:00 PM.",
+        "tags": [
+            {
+                "tag_type": "business",
+                "start": 0,
+                "end": 11,
+                "meta": {
+                    "business_id": "EBK0OkVMBg_n_KxAU_4DZg"
+                }
+            },
+            {
+                "tag_type": "highlight",
+                "start": 31,
+                "end": 51
+            },
+            {
+                "tag_type": "business",
+                "start": 89,
+                "end": 101,
+                "meta": {
+                    "business_id": "Qr9FJkZAzav9px3xsEf1yQ"
+                }
+            },
+            {
+                "tag_type": "highlight",
+                "start": 129,
+                "end": 149
+            },
+            {
+                "tag_type": "highlight",
+                "start": 161,
+                "end": 180
+            },
+            {
+                "tag_type": "business",
+                "start": 182,
+                "end": 199,
+                "meta": {
+                    "business_id": "B1XdGwZZ5ee2fBdngj7NUw"
+                }
+            },
+            {
+                "tag_type": "highlight",
+                "start": 225,
+                "end": 243
+            },
+            {
+                "tag_type": "highlight",
+                "start": 257,
+                "end": 276
+            }
+        ]
+    },
+    "types": [
+        "business_question"
+    ],
+    "entities": [
+        {
+            "businesses": [
+                {
+                    "id": "Qr9FJkZAzav9px3xsEf1yQ",
+                    "alias": "norms-pizza-new-york",
+                    "name": "Norm's Pizza",
+                    "url": "https://www.yelp.com/biz/norms-pizza-new-york?adjust_creative=uKZbO3XxGEy7Htt5nSGiRw&utm_campaign=yelp_api_v3&utm_medium=api_v3_public_ai_api_chat_v2&utm_source=uKZbO3XxGEy7Htt5nSGiRw",
+                    "location": {
+                        "address1": "8 Cortlandt St",
+                        "address2": null,
+                        "address3": "",
+                        "city": "New York",
+                        "zip_code": null,
+                        "state": "NY",
+                        "country": "US",
+                        "formatted_address": "8 Cortlandt St\nNew York, NY 10007"
+                    },
+                    "coordinates": {
+                        "latitude": 40.71008448698627,
+                        "longitude": -74.0103149
+                    },
+                    "review_count": 41,
+                    "price": null,
+                    "rating": 4.6,
+                    "categories": [
+                        {
+                            "alias": "pizza",
+                            "title": "Pizza"
+                        }
+                    ],
+                    "attributes": {
+                        "BusinessUrl": "http://www.normspizza.com",
+                        "AboutThisBizBioPhotoDict": null,
+                        "AboutThisBizBusinessRecommendation": [],
+                        "BusinessAddressAlternate": null,
+                        "BusinessCategorySic": null,
+                        "BusinessMovedFrom": null,
+                        "BusinessNameAlternate": null,
+                        "BusinessOpeningDate": null,
+                        "BusinessTempClosed": null,
+                        "GroupName": null,
+                        "StoreCode": null,
+                        "AboutThisBizBio": null,
+                        "AboutThisBizBioFirstName": null,
+                        "AboutThisBizBioLastName": null,
+                        "AboutThisBizHistory": null,
+                        "AboutThisBizRole": null,
+                        "AboutThisBizSpecialties": "Norm\u2019s is a straight-up, no-frills pizza parlor. Heavy on the nostalgia and low on the BS, this is classic Brooklyn pizza for the people. We use only the highest quality ingredients, and we utilize the centuries-old technique of natural leavening to make our dough. At Norm\u2019s, there\u2019s a slice for you.",
+                        "AboutThisBizYearEstablished": null,
+                        "Alcohol": "none",
+                        "Ambience": null,
+                        "BikeParking": null,
+                        "BusinessAcceptsAndroidPay": null,
+                        "BusinessAcceptsApplePay": null,
+                        "BusinessAcceptsBitcoin": null,
+                        "BusinessAcceptsCreditCards": true,
+                        "BusinessDisplayUrl": null,
+                        "BusinessMovedTo": null,
+                        "BusinessParking": {
+                            "valet": false,
+                            "garage": false,
+                            "street": false,
+                            "lot": false,
+                            "validated": true
+                        },
+                        "BYOB": false,
+                        "BYOBCorkage": null,
+                        "Caters": true,
+                        "Corkage": null,
+                        "DogsAllowed": null,
+                        "DriveThru": null,
+                        "FlowerDelivery": null,
+                        "GenderNeutralRestrooms": null,
+                        "GoodForKids": null,
+                        "GoodForMeal": null,
+                        "HappyHour": null,
+                        "HasTV": false,
+                        "MenuUrl": "https://normspizza.com/welcome#menu-home",
+                        "NationalProviderIdentifier": null,
+                        "NoiseLevel": null,
+                        "OffersMilitaryDiscount": null,
+                        "OngoingVigilanteEvent": null,
+                        "OnlineReservations": null,
+                        "Open24Hours": null,
+                        "BusinessOpenToAll": null,
+                        "PlatformDelivery": null,
+                        "PokestopNearby": null,
+                        "RestaurantsCounterService": null,
+                        "RestaurantsDelivery": true,
+                        "RestaurantsGoodForGroups": null,
+                        "RestaurantsPriceRange": null,
+                        "RestaurantsPriceRange2": null,
+                        "RestaurantsReservations": null,
+                        "RestaurantsTableService": null,
+                        "RestaurantsTakeOut": true,
+                        "WaitlistReservation": null,
+                        "WheelchairAccessible": true,
+                        "WiFi": null,
+                        "biz_summary": {
+                            "summary": "NY-style pizza with chewy crust near the World Trade Center Memorial.",
+                            "is_inactive": false,
+                            "allows_auto_summary_generation": true,
+                            "eligible_reviews_considered": 30
+                        },
+                        "biz_summary_long": {
+                            "summary": "Classic pizza parlor with a 1960s-inspired design offering prepared slices in Downtown Brooklyn. Norm's Pizza uses naturally leavened dough and high-quality ingredients, baked in high-temperature electric ovens. The menu features a variety of pies, including the distinctive vodka sauce pizza and avant garlic slice, with limited standing tables available for dining.",
+                            "is_inactive": false,
+                            "allows_auto_summary_generation": true,
+                            "eligible_reviews_considered": 17
+                        }
+                    },
+                    "phone": "+16466492692",
+                    "summaries": {
+                        "short": "NY-style pizza with chewy crust near the World Trade Center Memorial.",
+                        "medium": "Classic pizza parlor with a 1960s-inspired design offering prepared slices in Downtown Brooklyn. Norm's Pizza uses naturally leavened dough and high-quality ingredients, baked in high-temperature electric ovens.",
+                        "long": "Classic pizza parlor with a 1960s-inspired design offering prepared slices in Downtown Brooklyn. Norm's Pizza uses naturally leavened dough and high-quality ingredients, baked in high-temperature electric ovens. The menu features a variety of pies, including the distinctive vodka sauce pizza and avant garlic slice, with limited standing tables available for dining."
+                    },
+                    "contextual_info": {
+                        "summary": null,
+                        "review_snippets": [],
+                        "business_hours": [
+                            {
+                                "day_of_week": "Monday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-23 10:00:00",
+                                        "close_time": "2025-06-23 22:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            },
+                            {
+                                "day_of_week": "Tuesday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-24 10:00:00",
+                                        "close_time": "2025-06-24 22:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            },
+                            {
+                                "day_of_week": "Wednesday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-25 10:00:00",
+                                        "close_time": "2025-06-25 22:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            },
+                            {
+                                "day_of_week": "Thursday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-26 10:00:00",
+                                        "close_time": "2025-06-26 22:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            },
+                            {
+                                "day_of_week": "Friday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-27 10:00:00",
+                                        "close_time": "2025-06-27 22:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            },
+                            {
+                                "day_of_week": "Saturday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-28 10:00:00",
+                                        "close_time": "2025-06-28 22:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            },
+                            {
+                                "day_of_week": "Sunday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-29 11:00:00",
+                                        "close_time": "2025-06-29 21:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            }
+                        ],
+                        "photos": [
+                            {
+                                "original_url": "https://s3-media0.fl.yelpcdn.com/bphoto/fQmKa1TxZlIudVp_CS84hw/o.jpg"
+                            },
+                            {
+                                "original_url": "https://s3-media0.fl.yelpcdn.com/bphoto/w0PxbS84It-NhZMLEUrCIA/o.jpg"
+                            },
+                            {
+                                "original_url": "https://s3-media0.fl.yelpcdn.com/bphoto/rJoupHXh7UuM2r4t2jxAIw/o.jpg"
+                            }
+                        ],
+                        "review_snippet": "Great [[HIGHLIGHT]]pizza[[ENDHIGHLIGHT]]! Nice thin crispy crust.. pizza doesn't have any flop which I sort of like in my NY..."
+                    }
+                },
+                {
+                    "id": "EBK0OkVMBg_n_KxAU_4DZg",
+                    "alias": "double-zero-new-york-5",
+                    "name": "Double Zero",
+                    "url": "https://www.yelp.com/biz/double-zero-new-york-5?adjust_creative=uKZbO3XxGEy7Htt5nSGiRw&utm_campaign=yelp_api_v3&utm_medium=api_v3_public_ai_api_chat_v2&utm_source=uKZbO3XxGEy7Htt5nSGiRw",
+                    "location": {
+                        "address1": "65 2nd Ave",
+                        "address2": "",
+                        "address3": "",
+                        "city": "New York",
+                        "zip_code": null,
+                        "state": "NY",
+                        "country": "US",
+                        "formatted_address": "65 2nd Ave\nNew York, NY 10003"
+                    },
+                    "coordinates": {
+                        "latitude": 40.7260895,
+                        "longitude": -73.9897998
+                    },
+                    "review_count": 662,
+                    "price": "$$",
+                    "rating": 4.3,
+                    "categories": [
+                        {
+                            "alias": "pizza",
+                            "title": "Pizza"
+                        },
+                        {
+                            "alias": "italian",
+                            "title": "Italian"
+                        }
+                    ],
+                    "attributes": {
+                        "BusinessAcceptsApplePay": false,
+                        "GenderNeutralRestrooms": true,
+                        "PokestopNearby": true,
+                        "BusinessUrl": "https://www.matthewkenneycuisine.com/double-zero",
+                        "AboutThisBizBioPhotoDict": null,
+                        "AboutThisBizBusinessRecommendation": [],
+                        "BusinessAddressAlternate": null,
+                        "BusinessCategorySic": null,
+                        "BusinessMovedFrom": null,
+                        "BusinessNameAlternate": null,
+                        "BusinessOpeningDate": null,
+                        "BusinessTempClosed": null,
+                        "GroupName": null,
+                        "StoreCode": null,
+                        "AboutThisBizBio": null,
+                        "AboutThisBizBioFirstName": null,
+                        "AboutThisBizBioLastName": null,
+                        "AboutThisBizHistory": null,
+                        "AboutThisBizRole": null,
+                        "AboutThisBizSpecialties": null,
+                        "AboutThisBizYearEstablished": null,
+                        "Alcohol": "full_bar",
+                        "Ambience": {
+                            "divey": false,
+                            "hipster": null,
+                            "casual": null,
+                            "touristy": false,
+                            "trendy": true,
+                            "intimate": null,
+                            "romantic": null,
+                            "classy": null,
+                            "upscale": null
+                        },
+                        "BikeParking": true,
+                        "BusinessAcceptsAndroidPay": null,
+                        "BusinessAcceptsBitcoin": false,
+                        "BusinessAcceptsCreditCards": true,
+                        "BusinessDisplayUrl": "",
+                        "BusinessMovedTo": null,
+                        "BusinessParking": {
+                            "garage": false,
+                            "street": true,
+                            "validated": false,
+                            "lot": false,
+                            "valet": false
+                        },
+                        "BYOB": false,
+                        "BYOBCorkage": null,
+                        "Caters": true,
+                        "Corkage": false,
+                        "DogsAllowed": true,
+                        "DriveThru": null,
+                        "FlowerDelivery": null,
+                        "GoodForKids": false,
+                        "GoodForMeal": {
+                            "dessert": null,
+                            "latenight": false,
+                            "lunch": null,
+                            "dinner": true,
+                            "brunch": false,
+                            "breakfast": false
+                        },
+                        "HappyHour": false,
+                        "HasTV": false,
+                        "MenuUrl": "",
+                        "NationalProviderIdentifier": null,
+                        "NoiseLevel": "average",
+                        "OffersMilitaryDiscount": null,
+                        "OngoingVigilanteEvent": null,
+                        "OnlineReservations": null,
+                        "Open24Hours": null,
+                        "BusinessOpenToAll": null,
+                        "PlatformDelivery": null,
+                        "RestaurantsAttire": "casual",
+                        "RestaurantsCounterService": null,
+                        "RestaurantsDelivery": true,
+                        "RestaurantsGoodForGroups": true,
+                        "RestaurantsPriceRange": null,
+                        "RestaurantsPriceRange2": 2,
+                        "RestaurantsReservations": true,
+                        "RestaurantsTableService": true,
+                        "RestaurantsTakeOut": true,
+                        "WaitlistReservation": null,
+                        "WheelchairAccessible": true,
+                        "WiFi": "free",
+                        "biz_summary_long": {
+                            "summary": "Vegan Italian restaurant with indoor seating offering a casual ambiance and outdoor seating with a street view. The menu includes a diverse selection of pizzas, pastas, and small plates, all crafted with plant-based ingredients. The establishment features a thin, crispy crust and creative toppings like truffle mushrooms and cashew cheese. The restaurant caters to both vegans and non-vegans, with gluten-free options and accommodating service.",
+                            "is_inactive": false,
+                            "allows_auto_summary_generation": true,
+                            "eligible_reviews_considered": 49
+                        },
+                        "biz_summary": {
+                            "summary": "Vegan pizzeria with a wood-burning oven offering cashew cheese and truffle pizzas.",
+                            "is_inactive": false,
+                            "allows_auto_summary_generation": true,
+                            "eligible_reviews_considered": 30
+                        }
+                    },
+                    "phone": "+12127771608",
+                    "summaries": {
+                        "short": "Vegan pizzeria with a wood-burning oven offering cashew cheese and truffle pizzas.",
+                        "medium": "Vegan Italian restaurant with indoor seating offering a casual ambiance and outdoor seating with a street view. The menu includes a diverse selection of pizzas, pastas, and small plates, all crafted with plant-based ingredients. The establishment features a thin, crispy crust and creative toppings like truffle mushrooms and cashew cheese.",
+                        "long": "Vegan Italian restaurant with indoor seating offering a casual ambiance and outdoor seating with a street view. The menu includes a diverse selection of pizzas, pastas, and small plates, all crafted with plant-based ingredients. The establishment features a thin, crispy crust and creative toppings like truffle mushrooms and cashew cheese. The restaurant caters to both vegans and non-vegans, with gluten-free options and accommodating service."
+                    },
+                    "contextual_info": {
+                        "summary": null,
+                        "review_snippets": [],
+                        "business_hours": [
+                            {
+                                "day_of_week": "Monday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-23 12:00:00",
+                                        "close_time": "2025-06-23 23:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            },
+                            {
+                                "day_of_week": "Tuesday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-24 12:00:00",
+                                        "close_time": "2025-06-24 23:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            },
+                            {
+                                "day_of_week": "Wednesday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-25 12:00:00",
+                                        "close_time": "2025-06-25 23:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            },
+                            {
+                                "day_of_week": "Thursday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-26 12:00:00",
+                                        "close_time": "2025-06-26 23:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            },
+                            {
+                                "day_of_week": "Friday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-27 12:00:00",
+                                        "close_time": "2025-06-28 01:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            },
+                            {
+                                "day_of_week": "Saturday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-28 12:00:00",
+                                        "close_time": "2025-06-29 01:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            },
+                            {
+                                "day_of_week": "Sunday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-29 12:00:00",
+                                        "close_time": "2025-06-29 23:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            }
+                        ],
+                        "photos": [
+                            {
+                                "original_url": "https://s3-media0.fl.yelpcdn.com/bphoto/co1F86z4CLAShB4Kx21MHg/o.jpg"
+                            },
+                            {
+                                "original_url": "https://s3-media0.fl.yelpcdn.com/bphoto/Z6o9k1Wj5050wQwxSpcxDg/o.jpg"
+                            },
+                            {
+                                "original_url": "https://s3-media0.fl.yelpcdn.com/bphoto/OZP77Pp94T-AW25MEOjGlA/o.jpg"
+                            }
+                        ],
+                        "review_snippet": "I wouldnt come back since i prefer non [[HIGHLIGHT]]vegan pizza[[ENDHIGHLIGHT]] but the service and ambiance is good and it..."
+                    }
+                },
+                {
+                    "id": "B1XdGwZZ5ee2fBdngj7NUw",
+                    "alias": "underground-pizza-new-york",
+                    "name": "Underground Pizza",
+                    "url": "https://www.yelp.com/biz/underground-pizza-new-york?adjust_creative=uKZbO3XxGEy7Htt5nSGiRw&utm_campaign=yelp_api_v3&utm_medium=api_v3_public_ai_api_chat_v2&utm_source=uKZbO3XxGEy7Htt5nSGiRw",
+                    "location": {
+                        "address1": "3 Hanover Sq",
+                        "address2": "",
+                        "address3": "",
+                        "city": "New York",
+                        "zip_code": null,
+                        "state": "NY",
+                        "country": "US",
+                        "formatted_address": "3 Hanover Sq\nNew York, NY 10004"
+                    },
+                    "coordinates": {
+                        "latitude": 40.7048741,
+                        "longitude": -74.0095469
+                    },
+                    "review_count": 361,
+                    "price": "$",
+                    "rating": 4.1,
+                    "categories": [
+                        {
+                            "alias": "pizza",
+                            "title": "Pizza"
+                        },
+                        {
+                            "alias": "italian",
+                            "title": "Italian"
+                        }
+                    ],
+                    "attributes": {
+                        "BusinessAcceptsAndroidPay": false,
+                        "BusinessAcceptsApplePay": false,
+                        "GenderNeutralRestrooms": true,
+                        "BusinessUrl": "https://www.undergroundpizzanyny.com",
+                        "AboutThisBizBioPhotoDict": null,
+                        "AboutThisBizBusinessRecommendation": [],
+                        "BusinessAddressAlternate": null,
+                        "BusinessCategorySic": null,
+                        "BusinessMovedFrom": null,
+                        "BusinessNameAlternate": null,
+                        "BusinessOpeningDate": null,
+                        "BusinessTempClosed": null,
+                        "GroupName": null,
+                        "StoreCode": null,
+                        "AboutThisBizBio": null,
+                        "AboutThisBizBioFirstName": null,
+                        "AboutThisBizBioLastName": null,
+                        "AboutThisBizHistory": null,
+                        "AboutThisBizRole": null,
+                        "AboutThisBizSpecialties": null,
+                        "AboutThisBizYearEstablished": null,
+                        "Alcohol": "none",
+                        "Ambience": {
+                            "touristy": false,
+                            "hipster": false,
+                            "romantic": false,
+                            "divey": null,
+                            "intimate": false,
+                            "trendy": false,
+                            "upscale": false,
+                            "classy": false,
+                            "casual": true
+                        },
+                        "BikeParking": true,
+                        "BusinessAcceptsBitcoin": null,
+                        "BusinessAcceptsCreditCards": true,
+                        "BusinessDisplayUrl": null,
+                        "BusinessMovedTo": null,
+                        "BusinessParking": {
+                            "valet": false,
+                            "garage": false,
+                            "street": true,
+                            "lot": false,
+                            "validated": false
+                        },
+                        "BYOB": null,
+                        "BYOBCorkage": "no",
+                        "Caters": true,
+                        "Corkage": null,
+                        "DogsAllowed": null,
+                        "DriveThru": null,
+                        "FlowerDelivery": null,
+                        "GoodForKids": true,
+                        "GoodForMeal": {
+                            "dessert": false,
+                            "latenight": false,
+                            "lunch": true,
+                            "dinner": true,
+                            "brunch": false,
+                            "breakfast": false
+                        },
+                        "HappyHour": null,
+                        "HasTV": true,
+                        "MenuUrl": "https://undergroundpizzanyny.com/menu",
+                        "NationalProviderIdentifier": null,
+                        "NoiseLevel": "average",
+                        "OffersMilitaryDiscount": null,
+                        "OngoingVigilanteEvent": null,
+                        "OnlineReservations": null,
+                        "Open24Hours": null,
+                        "BusinessOpenToAll": null,
+                        "PlatformDelivery": null,
+                        "PokestopNearby": null,
+                        "RestaurantsAttire": "casual",
+                        "RestaurantsCounterService": null,
+                        "RestaurantsDelivery": true,
+                        "RestaurantsGoodForGroups": true,
+                        "RestaurantsPriceRange": null,
+                        "RestaurantsPriceRange2": 1,
+                        "RestaurantsReservations": false,
+                        "RestaurantsTableService": null,
+                        "RestaurantsTakeOut": true,
+                        "WaitlistReservation": null,
+                        "WheelchairAccessible": null,
+                        "WiFi": "no",
+                        "biz_summary_long": {
+                            "summary": "Authentic pizzeria with a diverse menu focusing on traditional and specialty pizzas, including gluten-free and keto options with cauliflower crust. Notable dishes include the Shrimp Parmigiana with Pasta Lunch Special and the Grandma Pizza. The establishment features a compact dining area with retro decor. Customers can enjoy quick service and a variety of lunch specials, making it a convenient spot for a satisfying meal.",
+                            "is_inactive": false,
+                            "allows_auto_summary_generation": true,
+                            "eligible_reviews_considered": 26
+                        },
+                        "biz_summary": {
+                            "summary": "New York-style pizza known for Grandma's pizza and crispy thin crust.",
+                            "is_inactive": false,
+                            "allows_auto_summary_generation": true,
+                            "eligible_reviews_considered": 23
+                        }
+                    },
+                    "phone": "+12124254442",
+                    "summaries": {
+                        "short": "New York-style pizza known for Grandma's pizza and crispy thin crust.",
+                        "medium": "Authentic pizzeria with a diverse menu focusing on traditional and specialty pizzas, including gluten-free and keto options with cauliflower crust. Notable dishes include the Shrimp Parmigiana with Pasta Lunch Special and the Grandma Pizza. The establishment features a compact dining area with retro decor.",
+                        "long": "Authentic pizzeria with a diverse menu focusing on traditional and specialty pizzas, including gluten-free and keto options with cauliflower crust. Notable dishes include the Shrimp Parmigiana with Pasta Lunch Special and the Grandma Pizza. The establishment features a compact dining area with retro decor. Customers can enjoy quick service and a variety of lunch specials, making it a convenient spot for a satisfying meal."
+                    },
+                    "contextual_info": {
+                        "summary": null,
+                        "review_snippets": [],
+                        "business_hours": [
+                            {
+                                "day_of_week": "Monday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-23 09:00:00",
+                                        "close_time": "2025-06-23 21:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            },
+                            {
+                                "day_of_week": "Tuesday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-24 09:00:00",
+                                        "close_time": "2025-06-24 21:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            },
+                            {
+                                "day_of_week": "Wednesday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-25 09:00:00",
+                                        "close_time": "2025-06-25 21:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            },
+                            {
+                                "day_of_week": "Thursday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-26 09:00:00",
+                                        "close_time": "2025-06-26 21:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            },
+                            {
+                                "day_of_week": "Friday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-27 09:00:00",
+                                        "close_time": "2025-06-27 21:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            },
+                            {
+                                "day_of_week": "Saturday",
+                                "business_hours": [
+                                    {
+                                        "open_time": "2025-06-28 10:00:00",
+                                        "close_time": "2025-06-28 20:00:00"
+                                    }
+                                ],
+                                "special_hours_applied": false
+                            },
+                            {
+                                "day_of_week": "Sunday",
+                                "business_hours": [],
+                                "special_hours_applied": false
+                            }
+                        ],
+                        "photos": [
+                            {
+                                "original_url": "https://s3-media0.fl.yelpcdn.com/bphoto/a6P1kw34CNDT49Vq5TmyDA/o.jpg"
+                            },
+                            {
+                                "original_url": "https://s3-media0.fl.yelpcdn.com/bphoto/C-__uEe2mlqP3HlecTM9FQ/o.jpg"
+                            },
+                            {
+                                "original_url": "https://s3-media0.fl.yelpcdn.com/bphoto/4j1ApbUt8Un2E05eoyH46A/o.jpg"
+                            }
+                        ],
+                        "review_snippet": "Maybe because I've been raised in NJ and gotten my fair share of \"NY Style [[HIGHLIGHT]]Pizzas[[ENDHIGHLIGHT]]\" and \"big-box..."
+                    }
+                }
+            ]
+        }
+    ],
+    "chat_id": "7ac95mkCJBR9WVPfpf3R_w"
+}
+Important Fields
+response.text: The natural language summary about Vegan Pizza City’s hours.
+types: Indicates that the response type is business_question.
+entities.businesses[].contextual_info.business_hours: Holds the detailed schedule (day_of_week, open_time, close_time).
+special_hours_applied: A boolean indicating whether any special hours (like holidays) are active.
+chat_id: Maintains continuity in the conversation across multiple queries.
+Visit the Yelp AI API Reference page for detailed information on the fields returned by the API endpoint.
+
+Next Steps
+Error Handling: Familiarize yourself with the API error codes to gracefully handle issues like invalid requests or rate limits. For comprehensive details on each potential error code, refer to the Yelp AI API Reference page.
+Explore Current Capabilities: Besides local business search & recommendations, the Yelp AI API supports additional capabilities. Refer to the Current Capabilities & Limitations section for more information.
+Explore Integration Recipes: Check our Integration Recipes to learn how to integrate the Yelp AI API in a framework of your choice.
+Explore Yelp's Agentic AI API: Check out our Agentic AI API documentation for more advanced AI capabilities that can help you build sophisticated conversational applications and agentic experiences with Yelp's local business data.
+Questions or Feedback?
+If you have any questions, run into issues, or would like to suggest improvements, please reach out through our Support page. We’re here to help!
+
+That’s it! With these basics covered, you’re ready to build conversational experiences powered by Yelp's Yelp AI API. Happy building!

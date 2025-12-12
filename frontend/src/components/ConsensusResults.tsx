@@ -243,8 +243,8 @@ export default function ConsensusResults({ results: initialResults, sessionId, c
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-gray-300 border-t-yelp-red rounded-full animate-spin"></div>
-                  Finding More Options...
+                  <span>Finding More Options...</span>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 </span>
               ) : (
                 'Load More Restaurants'

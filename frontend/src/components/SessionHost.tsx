@@ -15,6 +15,8 @@ export default function SessionHost() {
   const [loading, setLoading] = useState(false);
   const [matchWordIndex, setMatchWordIndex] = useState(0);
   const { socket } = useSocket(sessionId);
+  const hostParticipant = session?.participants.find(p => p.id === session?.hostParticipantId);
+  const [groupScreenReady, setGroupScreenReady] = useState(false);
 
   const loadSession = useCallback(async () => {
     if (!sessionId) return;
@@ -57,6 +59,17 @@ export default function SessionHost() {
 
     return () => clearInterval(interval);
   }, [loading]);
+
+  useEffect(() => {
+    if (
+      hostParticipant?.hasSubmitted &&
+      (!session?.consensusResults || session.consensusResults.length === 0)
+    ) {
+      setGroupScreenReady(true);
+    } else {
+      setGroupScreenReady(false);
+    }
+  }, [hostParticipant?.hasSubmitted, session?.consensusResults?.length]);
 
   // Explicitly join socket room with host name when session loads
   useEffect(() => {
@@ -169,8 +182,6 @@ export default function SessionHost() {
     );
   }
 
-  // Check if host has submitted preferences
-  const hostParticipant = session.participants.find(p => p.id === session.hostParticipantId);
   if (hostParticipant && !hostParticipant.hasSubmitted) {
     return (
       <PreferenceForm
@@ -187,7 +198,11 @@ export default function SessionHost() {
   const allReady = totalCount > 0 && submittedCount === totalCount;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div
+      className={`min-h-screen bg-gray-50 py-8 px-4 transition-all duration-500 ${
+        groupScreenReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+      }`}
+    >
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">

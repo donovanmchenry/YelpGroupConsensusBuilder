@@ -21,8 +21,11 @@ export default function PreferenceForm({ sessionId, participantId, participantNa
   const [gettingLocation, setGettingLocation] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [entered, setEntered] = useState(false);
 
   useEffect(() => {
+    setEntered(true);
+
     // Get user's location
     if (navigator.geolocation) {
       setGettingLocation(true);
@@ -123,14 +126,18 @@ export default function PreferenceForm({ sessionId, participantId, participantNa
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div
+      className={`min-h-screen bg-gray-50 py-8 px-4 transition-all duration-500 ${
+        entered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+      }`}
+    >
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             What are you in the mood for?
           </h1>
           <p className="text-gray-600">
-            Share your preferences, {participantName}
+            Share your preferences, {participantName}!
           </p>
         </div>
 

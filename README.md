@@ -2,7 +2,7 @@
 
 **Solve "where should we eat?" with AI-powered group decision making**
 
-Winner submission for the Yelp AI API Hackathon - Built with React, Node.js, Socket.io, and Yelp AI API.
+Built with React, Node.js, Socket.io, and Yelp AI API.
 
 ## 🎯 Problem
 
@@ -182,7 +182,3 @@ Built for the Yelp AI API Hackathon 2025
 
 - Yelp for providing the amazing AI API
 - The open-source community for the tools that made this possible
-
----
-
-**🤖 Generated with Claude Code**

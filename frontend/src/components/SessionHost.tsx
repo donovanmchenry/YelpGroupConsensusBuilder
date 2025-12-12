@@ -1,23 +1,39 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { getSession } from '../utils/api';
+import { getSession, triggerConsensus } from '../utils/api';
 import { useSocket } from '../hooks/useSocket';
 import type { Session } from '../types';
 import ShareLink from './ShareLink';
 import ConsensusResults from './ConsensusResults';
 import PreferenceForm from './PreferenceForm';
 
+const MATCH_WORDS = ['Perfect', 'Spot-on', 'Tailor-made', 'Amazing', 'Curated'];
+
 export default function SessionHost() {
   const { id: sessionId } = useParams<{ id: string }>();
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(false);
+  const [matchWordIndex, setMatchWordIndex] = useState(0);
   const { socket } = useSocket(sessionId);
 
   const loadSession = useCallback(async () => {
     if (!sessionId) return;
     try {
       const data = await getSession(sessionId);
-      setSession(data);
+      setSession(prev => {
+        if (
+          prev?.consensusResults &&
+          (!data.consensusResults || data.consensusResults.length === 0)
+        ) {
+          return {
+            ...data,
+            consensusResults: prev.consensusResults,
+            chatId: prev.chatId,
+            status: prev.status,
+          };
+        }
+        return data;
+      });
     } catch (error) {
       console.error('Failed to load session:', error);
     }
@@ -28,6 +44,19 @@ export default function SessionHost() {
       loadSession();
     }
   }, [sessionId, loadSession]);
+
+  useEffect(() => {
+    if (!loading) {
+      setMatchWordIndex(0);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setMatchWordIndex((prev) => (prev + 1) % MATCH_WORDS.length);
+    }, 1200);
+
+    return () => clearInterval(interval);
+  }, [loading]);
 
   // Explicitly join socket room with host name when session loads
   useEffect(() => {
@@ -57,10 +86,15 @@ export default function SessionHost() {
       loadSession();
     };
 
-    const handleConsensusResults = (data: any) => {
+    const handleConsensusResults = (data: { results: Session['consensusResults']; chatId?: string }) => {
       console.log('[HOST] consensus-results event received!', data);
       setLoading(false);
-      loadSession();
+      setSession(prev => prev ? {
+        ...prev,
+        consensusResults: data.results || prev.consensusResults,
+        chatId: data.chatId || prev.chatId,
+        status: 'completed',
+      } : prev);
     };
 
     const handleStatusUpdate = () => {
@@ -93,10 +127,24 @@ export default function SessionHost() {
     };
   }, [socket, loadSession]);
 
-  const handleFindRestaurants = () => {
-    if (!socket || !sessionId) return;
+  const handleFindRestaurants = async () => {
+    if (!sessionId) return;
     setLoading(true);
-    socket.emit('trigger-consensus', sessionId);
+    try {
+      const { results, chatId } = await triggerConsensus(sessionId);
+      setSession(prev => prev ? {
+        ...prev,
+        consensusResults: results || prev.consensusResults,
+        chatId: chatId || prev.chatId,
+        status: 'completed',
+      } : prev);
+    } catch (error: any) {
+      console.error('Failed to find restaurants:', error);
+      const message = error?.response?.data?.error || error?.message || 'Failed to find restaurants. Please try again.';
+      alert(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!session) {
@@ -219,8 +267,17 @@ export default function SessionHost() {
                 >
                   {loading || session.status === 'analyzing' ? (
                     <span className="flex items-center justify-center gap-2">
+                      <span className="inline-flex items-center gap-1">
+                        <span>Finding</span>
+                        <span
+                          key={MATCH_WORDS[matchWordIndex]}
+                          className="inline-block animate-slide-up"
+                        >
+                          {MATCH_WORDS[matchWordIndex]}
+                        </span>
+                        <span>Matches...</span>
+                      </span>
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Finding Perfect Matches...
                     </span>
                   ) : (
                     'Find Restaurants'
@@ -231,6 +288,22 @@ export default function SessionHost() {
           </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes slideUp {
+          0% {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-slide-up {
+          animation: slideUp 0.3s ease forwards;
+        }
+      `}</style>
     </div>
   );
 }

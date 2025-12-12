@@ -94,6 +94,17 @@ class SessionService {
     }
   }
 
+  appendConsensusResults(sessionId: string, results: any[]): void {
+    const session = this.sessions.get(sessionId);
+    if (session) {
+      session.consensusResults = [
+        ...(session.consensusResults || []),
+        ...results,
+      ];
+      session.status = 'completed';
+    }
+  }
+
   private cleanupExpiredSessions(): void {
     const now = new Date();
     for (const [sessionId, session] of this.sessions.entries()) {

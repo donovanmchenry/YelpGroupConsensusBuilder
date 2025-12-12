@@ -100,8 +100,9 @@ app.post('/api/sessions/:id/preferences', (req, res) => {
 
 // Consensus endpoint
 app.post('/api/sessions/:id/consensus', async (req, res) => {
+  const sessionId = req.params.id;
   try {
-    const session = sessionService.getSession(req.params.id);
+    const session = sessionService.getSession(sessionId);
     if (!session) {
       return res.status(404).json({ error: 'Session not found' });
     }
@@ -115,26 +116,33 @@ app.post('/api/sessions/:id/consensus', async (req, res) => {
       return res.status(400).json({ error: 'No preferences submitted yet' });
     }
 
-    sessionService.updateSessionStatus(req.params.id, 'analyzing');
+    sessionService.updateSessionStatus(sessionId, 'analyzing');
+    io.to(sessionId).emit('status-update', { status: 'analyzing' });
 
     // Run consensus algorithm
     const { results, chatId } = await consensusService.findConsensus(preferences);
 
     // Save chatId and results
-    sessionService.setChatId(req.params.id, chatId);
-    sessionService.setConsensusResults(req.params.id, results);
+    sessionService.setChatId(sessionId, chatId);
+    sessionService.setConsensusResults(sessionId, results);
 
-    res.json({ results });
+    io.to(sessionId).emit('consensus-results', { results, chatId });
+    io.to(sessionId).emit('status-update', { status: 'completed' });
+
+    res.json({ results, chatId });
   } catch (error: any) {
     console.error('Consensus error:', error);
+    sessionService.updateSessionStatus(sessionId, 'waiting');
+    io.to(sessionId).emit('consensus-error', { message: error.message || 'Failed to find consensus' });
     res.status(500).json({ error: error.message });
   }
 });
 
 // Load more restaurants endpoint
 app.post('/api/sessions/:id/more-restaurants', async (req, res) => {
+  const sessionId = req.params.id;
   try {
-    const session = sessionService.getSession(req.params.id);
+    const session = sessionService.getSession(sessionId);
     if (!session) {
       return res.status(404).json({ error: 'Session not found' });
     }
@@ -153,9 +161,19 @@ app.post('/api/sessions/:id/more-restaurants', async (req, res) => {
     // Request more options from Yelp using the existing chat
     const moreResults = await consensusService.findMoreRestaurants(preferences, chatId);
 
+    if (moreResults.length > 0) {
+      sessionService.appendConsensusResults(sessionId, moreResults);
+      const updatedSession = sessionService.getSession(sessionId);
+      io.to(sessionId).emit('consensus-results', {
+        results: updatedSession?.consensusResults || [],
+        chatId: updatedSession?.chatId,
+      });
+    }
+
     res.json(moreResults);
   } catch (error: any) {
     console.error('Load more restaurants error:', error);
+    io.to(sessionId).emit('consensus-error', { message: error.message || 'Failed to load more restaurants' });
     res.status(500).json({ error: error.message });
   }
 });
@@ -235,7 +253,7 @@ io.on('connection', (socket) => {
       console.log(`[CONSENSUS] Emitting to ${socketsInRoom.length} sockets in room ${sessionId}`);
       socketsInRoom.forEach(s => console.log(`  - Socket ${s.id}`));
 
-      io.to(sessionId).emit('consensus-results', { results });
+      io.to(sessionId).emit('consensus-results', { results, chatId });
       console.log('[CONSENSUS] Event emitted');
     } catch (error: any) {
       console.error('Consensus error:', error);

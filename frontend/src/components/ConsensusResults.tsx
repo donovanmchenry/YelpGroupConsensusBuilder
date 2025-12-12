@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { ConsensusResult } from '../types';
 import ReservationFlow from './ReservationFlow';
 import { loadMoreRestaurants } from '../utils/api';
@@ -14,6 +14,10 @@ export default function ConsensusResults({ results: initialResults, sessionId, c
   const [results, setResults] = useState<ConsensusResult[]>(initialResults);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+
+  useEffect(() => {
+    setResults(initialResults);
+  }, [initialResults]);
 
   const handleLoadMore = async () => {
     console.log('[LOAD MORE] Button clicked');
@@ -39,9 +43,10 @@ export default function ConsensusResults({ results: initialResults, sessionId, c
       } else {
         setResults(prev => [...prev, ...moreResults]);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('[LOAD MORE] Failed to load more restaurants:', error);
-      alert('Failed to load more restaurants. Please try again.');
+      const message = error?.response?.data?.error || error?.message || 'Failed to load more restaurants. Please try again.';
+      alert(message);
       setHasMore(false);
     } finally {
       setLoading(false);
@@ -62,11 +67,6 @@ export default function ConsensusResults({ results: initialResults, sessionId, c
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-yelp-red rounded-full mx-auto mb-4 flex items-center justify-center">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-            </svg>
-          </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
             Perfect Matches Found!
           </h1>
@@ -239,7 +239,7 @@ export default function ConsensusResults({ results: initialResults, sessionId, c
             <button
               onClick={handleLoadMore}
               disabled={loading}
-              className="px-8 py-4 bg-white text-yelp-red border-2 border-yelp-red rounded-lg font-semibold text-lg hover:bg-yelp-red hover:text-white transition-colors disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+              className="px-8 py-4 bg-yelp-red text-white rounded-lg font-semibold text-lg hover:bg-red-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">

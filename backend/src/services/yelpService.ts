@@ -56,8 +56,10 @@ class YelpAIService {
         chatId: response.data.chat_id,
       };
     } catch (error: any) {
+      const apiError = error.response?.data?.error;
+      const errorMessage = apiError?.description || apiError?.code || error.message || 'Failed to search restaurants';
       console.error('Yelp API error:', error.response?.data || error.message);
-      throw new Error('Failed to search restaurants');
+      throw new Error(errorMessage);
     }
   }
 
@@ -82,8 +84,10 @@ class YelpAIService {
         chatId: response.data.chat_id,
       };
     } catch (error: any) {
+      const apiError = error.response?.data?.error;
+      const errorMessage = apiError?.description || apiError?.code || error.message || 'Failed to chat with Yelp AI';
       console.error('Yelp AI chat error:', error.response?.data || error.message);
-      throw new Error('Failed to chat with Yelp AI');
+      throw new Error(errorMessage);
     }
   }
 
@@ -111,8 +115,10 @@ class YelpAIService {
         chatId: response.data.chat_id,
       };
     } catch (error: any) {
+      const apiError = error.response?.data?.error;
+      const errorMessage = apiError?.description || apiError?.code || error.message || 'Failed to chat with Yelp AI';
       console.error('Yelp AI chat error:', error.response?.data || error.message);
-      throw new Error('Failed to chat with Yelp AI');
+      throw new Error(errorMessage);
     }
   }
 

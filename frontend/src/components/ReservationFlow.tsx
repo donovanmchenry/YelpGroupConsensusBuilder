@@ -132,7 +132,6 @@ export default function ReservationFlow({ restaurant, chatId: initialChatId, onB
             </div>
           </div>
         </div>
-        <div className="h-1 bg-gradient-to-r from-yelp-red/70 via-orange-400/60 to-transparent rounded-full mb-2"></div>
 
         {/* Chat Messages */}
         <div className="bg-white shadow-lg p-6 h-96 overflow-y-auto">

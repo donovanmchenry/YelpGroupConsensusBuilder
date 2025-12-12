@@ -137,32 +137,6 @@ This app demonstrates advanced Yelp AI API usage:
 - ✅ Location-based queries
 - ✅ Business data extraction (ratings, reviews, photos)
 
-## 🏆 Why This Wins
-
-### Technical Sophistication
-- **Distributed consensus algorithm** showing CS fundamentals
-- **Real-time collaboration** with WebSocket architecture
-- **Geospatial calculations** (centroid, distance formulas)
-- **Full-stack TypeScript** for type safety
-
-### Yelp API Mastery
-- Leverages conversational AI for search
-- Maintains chat context across requests
-- Showcases beta reservation features
-- Extracts and displays rich business data
-
-### Product Excellence
-- Solves a universal, relatable problem
-- Zero friction UX (no login required)
-- Transparent AI reasoning
-- Social coordination at its core
-
-### Resume Impact
-- Demonstrates algorithm design
-- Shows system architecture skills
-- Proves API integration expertise
-- Full-stack development capability
-
 ## 🛠️ Tech Stack
 
 - **Frontend**: React, TypeScript, Vite, Tailwind CSS, Socket.io Client, React Router

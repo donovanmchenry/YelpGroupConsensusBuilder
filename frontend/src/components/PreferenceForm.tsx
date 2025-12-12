@@ -11,9 +11,18 @@ interface Props {
   participantId: string;
   participantName: string;
   socket: Socket | null;
+  hideWaitingRoom?: boolean;
+  onSubmitSuccess?: (preferences: UserPreference) => void;
 }
 
-export default function PreferenceForm({ sessionId, participantId, participantName, socket }: Props) {
+export default function PreferenceForm({
+  sessionId,
+  participantId,
+  participantName,
+  socket,
+  hideWaitingRoom = false,
+  onSubmitSuccess,
+}: Props) {
   const [cuisines, setCuisines] = useState<string[]>([]);
   const [dietary, setDietary] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<number[]>([1, 2]);
@@ -104,6 +113,7 @@ export default function PreferenceForm({ sessionId, participantId, participantNa
         });
       }
 
+      onSubmitSuccess?.(preferences);
       setSubmitted(true);
     } catch (error) {
       console.error('Failed to submit preferences:', error);
@@ -114,6 +124,9 @@ export default function PreferenceForm({ sessionId, participantId, participantNa
   };
 
   if (submitted) {
+    if (hideWaitingRoom) {
+      return null;
+    }
     return (
       <WaitingRoom
         sessionId={sessionId}

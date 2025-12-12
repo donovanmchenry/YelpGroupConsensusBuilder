@@ -96,7 +96,7 @@ export default function ReservationFlow({ restaurant, chatId: initialChatId, onB
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-t-lg shadow-lg p-6 border-b">
+        <div className="bg-white rounded-t-lg shadow-lg p-6">
           <button
             onClick={onBack}
             className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
@@ -132,6 +132,7 @@ export default function ReservationFlow({ restaurant, chatId: initialChatId, onB
             </div>
           </div>
         </div>
+        <div className="h-1 bg-gradient-to-r from-yelp-red/70 via-orange-400/60 to-transparent rounded-full mb-2"></div>
 
         {/* Chat Messages */}
         <div className="bg-white shadow-lg p-6 h-96 overflow-y-auto">

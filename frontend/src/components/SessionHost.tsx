@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { getSession, triggerConsensus } from '../utils/api';
 import { useSocket } from '../hooks/useSocket';
 import type { Session } from '../types';
@@ -12,12 +12,16 @@ const MATCH_WORDS = ['Perfect', 'Spot-on', 'Tailor-made', 'Amazing', 'Curated'];
 
 export default function SessionHost() {
   const { id: sessionId } = useParams<{ id: string }>();
-  const [session, setSession] = useState<Session | null>(null);
+  const location = useLocation();
+  const initialSession = (location.state as { session?: Session } | undefined)?.session || null;
+  const [session, setSession] = useState<Session | null>(initialSession);
   const [loading, setLoading] = useState(false);
   const [matchWordIndex, setMatchWordIndex] = useState(0);
   const { socket } = useSocket(sessionId);
   const hostParticipant = session?.participants.find(p => p.id === session?.hostParticipantId);
-  const transitionClass = usePageTransition();
+  const [forceGroupView, setForceGroupView] = useState(false);
+  const currentView = hostParticipant && !hostParticipant.hasSubmitted && !forceGroupView ? 'preferences' : 'group';
+  const transitionClass = usePageTransition([currentView]);
 
   const loadSession = useCallback(async () => {
     if (!sessionId) return;
@@ -130,6 +134,12 @@ export default function SessionHost() {
     };
   }, [socket, loadSession]);
 
+  useEffect(() => {
+    if (hostParticipant?.hasSubmitted) {
+      setForceGroupView(false);
+    }
+  }, [hostParticipant?.hasSubmitted]);
+
   const handleFindRestaurants = async () => {
     if (!sessionId) return;
     setLoading(true);
@@ -172,14 +182,31 @@ export default function SessionHost() {
     );
   }
 
-  if (hostParticipant && !hostParticipant.hasSubmitted) {
+  if (hostParticipant && !hostParticipant.hasSubmitted && !forceGroupView) {
     return (
-      <PreferenceForm
-        sessionId={sessionId || ''}
-        participantId={hostParticipant.id}
-        participantName={session.hostName}
-        socket={socket}
-      />
+      <div className={`min-h-screen bg-gray-50 py-8 px-4 ${transitionClass}`}>
+        <PreferenceForm
+          sessionId={sessionId || ''}
+          participantId={hostParticipant.id}
+          participantName={session.hostName}
+          socket={socket}
+          hideWaitingRoom
+          onSubmitSuccess={(preferences) => {
+            setForceGroupView(true);
+            setSession(prev => {
+              if (!prev) return prev;
+              return {
+                ...prev,
+                participants: prev.participants.map(p =>
+                  p.id === hostParticipant.id
+                    ? { ...p, hasSubmitted: true, preferences }
+                    : p
+                ),
+              };
+            });
+          }}
+        />
+      </div>
     );
   }
 

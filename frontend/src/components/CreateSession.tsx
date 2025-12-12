@@ -16,7 +16,7 @@ export default function CreateSession() {
     setLoading(true);
     try {
       const session = await createSession(hostName.trim());
-      navigate(`/session/${session.id}`);
+      navigate(`/session/${session.id}`, { state: { session } });
     } catch (error) {
       console.error('Failed to create session:', error);
       alert('Failed to create session. Please try again.');

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getSession, addParticipant } from '../utils/api';
 import { useSocket } from '../hooks/useSocket';
 import PreferenceForm from './PreferenceForm';
+import { usePageTransition } from '../hooks/usePageTransition';
 
 export default function JoinSession() {
   const { id: sessionId } = useParams<{ id: string }>();
@@ -13,6 +14,7 @@ export default function JoinSession() {
   const [hasJoined, setHasJoined] = useState(false);
   const { socket } = useSocket(sessionId);
   const navigate = useNavigate();
+  const transitionClass = usePageTransition();
 
   useEffect(() => {
     if (sessionId) {
@@ -47,7 +49,7 @@ export default function JoinSession() {
 
   if (sessionExists === false) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className={`min-h-screen flex items-center justify-center p-4 ${transitionClass}`}>
         <div className="max-w-md w-full text-center">
           <div className="bg-white rounded-lg shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
@@ -80,7 +82,7 @@ export default function JoinSession() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className={`min-h-screen flex items-center justify-center p-4 ${transitionClass}`}>
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">

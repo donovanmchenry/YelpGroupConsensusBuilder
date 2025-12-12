@@ -3,6 +3,7 @@ import { Socket } from 'socket.io-client';
 import { getSession } from '../utils/api';
 import type { Session } from '../types';
 import ConsensusResults from './ConsensusResults';
+import { usePageTransition } from '../hooks/usePageTransition';
 
 interface Props {
   sessionId: string;
@@ -14,6 +15,7 @@ interface Props {
 export default function WaitingRoom({ sessionId, participantId, participantName, socket }: Props) {
   const [session, setSession] = useState<Session | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const transitionClass = usePageTransition();
 
   useEffect(() => {
     loadSession();
@@ -69,7 +71,7 @@ export default function WaitingRoom({ sessionId, participantId, participantName,
   const allReady = totalCount > 0 && submittedCount === totalCount;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className={`min-h-screen bg-gray-50 py-8 px-4 ${transitionClass}`}>
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-green-500 rounded-full mx-auto mb-4 flex items-center justify-center">

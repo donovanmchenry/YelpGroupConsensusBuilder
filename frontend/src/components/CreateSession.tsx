@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createSession } from '../utils/api';
+import { usePageTransition } from '../hooks/usePageTransition';
 
 export default function CreateSession() {
   const [hostName, setHostName] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const transitionClass = usePageTransition();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +26,7 @@ export default function CreateSession() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className={`min-h-screen flex items-center justify-center p-4 ${transitionClass}`}>
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">

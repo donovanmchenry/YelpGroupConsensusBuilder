@@ -4,6 +4,7 @@ import type { UserPreference } from '../types';
 import { CUISINE_OPTIONS, DIETARY_OPTIONS } from '../types';
 import { submitPreferences } from '../utils/api';
 import WaitingRoom from './WaitingRoom';
+import { usePageTransition } from '../hooks/usePageTransition';
 
 interface Props {
   sessionId: string;
@@ -21,11 +22,9 @@ export default function PreferenceForm({ sessionId, participantId, participantNa
   const [gettingLocation, setGettingLocation] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [entered, setEntered] = useState(false);
+  const transitionClass = usePageTransition();
 
   useEffect(() => {
-    setEntered(true);
-
     // Get user's location
     if (navigator.geolocation) {
       setGettingLocation(true);
@@ -126,11 +125,7 @@ export default function PreferenceForm({ sessionId, participantId, participantNa
   }
 
   return (
-    <div
-      className={`min-h-screen bg-gray-50 py-8 px-4 transition-all duration-500 ${
-        entered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-      }`}
-    >
+    <div className={`min-h-screen bg-gray-50 py-8 px-4 ${transitionClass}`}>
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">

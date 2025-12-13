@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { ConsensusResult } from '../types';
 import ReservationFlow from './ReservationFlow';
-import { loadMoreRestaurants } from '../utils/api';
+import { loadMoreRestaurants, refineResults } from '../utils/api';
 
 interface Props {
   results: ConsensusResult[];
@@ -14,6 +14,8 @@ export default function ConsensusResults({ results: initialResults, sessionId, c
   const [results, setResults] = useState<ConsensusResult[]>(initialResults);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [refining, setRefining] = useState(false);
+  const [refinementQuery, setRefinementQuery] = useState('');
 
   useEffect(() => {
     setResults(initialResults);
@@ -50,6 +52,45 @@ export default function ConsensusResults({ results: initialResults, sessionId, c
       setHasMore(false);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRefine = async () => {
+    console.log('[REFINE] Button clicked');
+    console.log('[REFINE] sessionId:', sessionId);
+    console.log('[REFINE] chatId:', chatId);
+    console.log('[REFINE] query:', refinementQuery);
+
+    if (!chatId) {
+      console.error('[REFINE] No chatId available!');
+      alert('Cannot refine: No chat session found. Please try finding restaurants again.');
+      return;
+    }
+
+    if (!refinementQuery.trim()) {
+      alert('Please enter what you\'re looking for');
+      return;
+    }
+
+    setRefining(true);
+    try {
+      console.log('[REFINE] Calling API...');
+      const refinedResults = await refineResults(sessionId, chatId, refinementQuery);
+      console.log('[REFINE] Got results:', refinedResults.length);
+
+      if (refinedResults.length === 0) {
+        alert('No restaurants found matching your description. Try a different query.');
+      } else {
+        // Add refined results to existing results instead of replacing
+        setResults(prev => [...prev, ...refinedResults]);
+        setRefinementQuery(''); // Clear input after successful refinement
+      }
+    } catch (error: any) {
+      console.error('[REFINE] Failed to refine results:', error);
+      const message = error?.response?.data?.error || error?.message || 'Failed to refine results. Please try again.';
+      alert(message);
+    } finally {
+      setRefining(false);
     }
   };
 
@@ -231,6 +272,71 @@ export default function ConsensusResults({ results: initialResults, sessionId, c
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Find More with AI Section */}
+        <div className="mt-12 mb-8">
+          <div className="bg-white rounded-lg shadow-md p-6 max-w-3xl mx-auto">
+            <div className="flex items-start gap-3 mb-4">
+              <svg className="w-6 h-6 text-yelp-red mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              </svg>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-900 mb-1">
+                  Find More with AI
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Describe additional features you want and we'll add more matching restaurants
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={refinementQuery}
+                onChange={(e) => setRefinementQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && !refining && handleRefine()}
+                placeholder='e.g., "looking for outdoor seating" or "need live music and craft beer"'
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yelp-red focus:border-transparent"
+                disabled={refining}
+              />
+              <button
+                onClick={handleRefine}
+                disabled={refining || !refinementQuery.trim()}
+                className="px-6 py-3 bg-yelp-red text-white rounded-lg font-semibold hover:bg-red-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap"
+              >
+                {refining ? (
+                  <span className="flex items-center gap-2">
+                    <span>Finding...</span>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  </span>
+                ) : (
+                  'Find More'
+                )}
+              </button>
+            </div>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="text-xs text-gray-500">Try:</span>
+              {[
+                "romantic atmosphere",
+                "outdoor seating",
+                "live music",
+                "good for large groups",
+                "quick lunch spots"
+              ].map(suggestion => (
+                <button
+                  key={suggestion}
+                  onClick={() => setRefinementQuery(suggestion)}
+                  className="text-xs px-3 py-1 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
+                  disabled={refining}
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Load More Button */}

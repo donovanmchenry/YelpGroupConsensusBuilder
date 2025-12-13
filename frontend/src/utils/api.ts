@@ -67,4 +67,16 @@ export const loadMoreRestaurants = async (
   return response.data;
 };
 
+export const refineResults = async (
+  sessionId: string,
+  chatId: string,
+  query: string
+): Promise<any[]> => {
+  const response = await api.post(`/api/sessions/${sessionId}/refine`, {
+    chatId,
+    query,
+  });
+  return response.data;
+};
+
 export default api;

@@ -343,6 +343,45 @@ class ConsensusService {
 
     return withReasoning;
   }
+
+  /**
+   * Refines results based on user's natural language description
+   */
+  async refineResults(preferences: UserPreference[], userQuery: string, chatId: string): Promise<ConsensusResult[]> {
+    if (preferences.length === 0) {
+      throw new Error('No preferences provided');
+    }
+
+    // Analyze group requirements
+    const groupRequirements = this.analyzeGroupPreferences(preferences);
+
+    // Build refined query that incorporates user's natural language request
+    const refinedQuery = `Based on our previous conversation about restaurants, I'd like to find additional options. ${userQuery}. Please suggest 5 more restaurants that match this description while still considering our group's preferences. Try to suggest different restaurants we haven't seen yet.`;
+
+    const { businesses } = await yelpService.chatWithBusinesses(refinedQuery, chatId);
+
+    if (businesses.length === 0) {
+      return [];
+    }
+
+    // Score each restaurant
+    const scored = businesses.map((business: any) => ({
+      business,
+      matchScore: this.calculateMatchScore(business, preferences),
+      matchDetails: this.calculateMatchDetails(business, preferences),
+      reasoningText: '', // Will be filled by AI
+    }));
+
+    // Sort by score and take top 5
+    const top5 = scored
+      .sort((a: any, b: any) => b.matchScore - a.matchScore)
+      .slice(0, 5);
+
+    // Add AI reasoning for matches
+    const withReasoning = await this.addAIReasoning(top5, groupRequirements, chatId);
+
+    return withReasoning;
+  }
 }
 
 export default new ConsensusService();

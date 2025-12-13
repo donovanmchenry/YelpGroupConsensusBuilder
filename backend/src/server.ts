@@ -178,6 +178,50 @@ app.post('/api/sessions/:id/more-restaurants', async (req, res) => {
   }
 });
 
+// Refine results endpoint
+app.post('/api/sessions/:id/refine', async (req, res) => {
+  const sessionId = req.params.id;
+  try {
+    const session = sessionService.getSession(sessionId);
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    const { query, chatId } = req.body;
+
+    if (!query || !chatId) {
+      return res.status(400).json({ error: 'Query and chatId are required' });
+    }
+
+    // Get all preferences
+    const preferences = session.participants
+      .filter(p => p.preferences)
+      .map(p => p.preferences!);
+
+    if (preferences.length === 0) {
+      return res.status(400).json({ error: 'No preferences submitted yet' });
+    }
+
+    // Use Yelp AI to refine results with user's natural language query
+    const refinedResults = await consensusService.refineResults(preferences, query, chatId);
+
+    // Add refined results to existing session results instead of replacing
+    if (refinedResults.length > 0) {
+      sessionService.appendConsensusResults(sessionId, refinedResults);
+      const updatedSession = sessionService.getSession(sessionId);
+      io.to(sessionId).emit('consensus-results', {
+        results: updatedSession?.consensusResults || [],
+        chatId,
+      });
+    }
+
+    res.json(refinedResults);
+  } catch (error: any) {
+    console.error('Refine results error:', error);
+    res.status(500).json({ error: error.message || 'Failed to refine results' });
+  }
+});
+
 // Reservation endpoint
 app.post('/api/reservations', async (req, res) => {
   try {

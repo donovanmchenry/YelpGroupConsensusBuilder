@@ -12,7 +12,7 @@ interface Props {
   socket: Socket | null;
 }
 
-export default function WaitingRoom({ sessionId, participantId, participantName, socket }: Props) {
+export default function WaitingRoom({ sessionId, participantId: _participantId, participantName: _participantName, socket }: Props) {
   const [session, setSession] = useState<Session | null>(null);
   const [showResults, setShowResults] = useState(false);
   const transitionClass = usePageTransition();

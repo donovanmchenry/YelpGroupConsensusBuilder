@@ -28,6 +28,14 @@ export default function PreferenceForm({
   const [priceRange, setPriceRange] = useState<number[]>([1, 2]);
   const [maxDistance, setMaxDistance] = useState(10);
   const [location, setLocation] = useState<{ lat: number; lng: number; address: string } | null>(null);
+  const [addressInput, setAddressInput] = useState('');
+  const [addressSuggestions, setAddressSuggestions] = useState<Array<{
+    display_name: string;
+    lat: string;
+    lon: string;
+  }>>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [gettingLocation, setGettingLocation] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -39,25 +47,140 @@ export default function PreferenceForm({
       setGettingLocation(true);
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setLocation({
+          const loc = {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
             address: 'Current Location',
-          });
+          };
+          setLocation(loc);
+          setAddressInput(loc.address);
           setGettingLocation(false);
         },
         () => {
           // Default to San Francisco if location denied
-          setLocation({
+          const loc = {
             lat: 37.7749,
             lng: -122.4194,
             address: 'San Francisco, CA',
-          });
+          };
+          setLocation(loc);
+          setAddressInput(loc.address);
           setGettingLocation(false);
         }
       );
     }
   }, []);
+
+  const useCurrentLocation = () => {
+    if (navigator.geolocation) {
+      setGettingLocation(true);
+      setShowSuggestions(false);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const loc = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+            address: 'Current Location',
+          };
+          setLocation(loc);
+          setAddressInput(loc.address);
+          setGettingLocation(false);
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          alert('Failed to get current location. Please enter an address manually.');
+          setGettingLocation(false);
+        }
+      );
+    }
+  };
+
+  const searchAddressSuggestions = async (query: string) => {
+    if (!query.trim() || query.length < 2) {
+      setAddressSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?` +
+        `format=json&` +
+        `q=${encodeURIComponent(query)}&` +
+        `limit=10&` +
+        `addressdetails=1&` +
+        `countrycodes=us`, // Focus on US addresses, remove if you need international
+        {
+          headers: {
+            'User-Agent': 'YelpGroupConsensusBuilder/1.0'
+          }
+        }
+      );
+      const data = await response.json();
+
+      setAddressSuggestions(data);
+      setShowSuggestions(data.length > 0);
+      setSelectedSuggestionIndex(-1);
+    } catch (error) {
+      console.error('Error fetching address suggestions:', error);
+      setAddressSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const selectAddress = (suggestion: { display_name: string; lat: string; lon: string }) => {
+    const loc = {
+      lat: parseFloat(suggestion.lat),
+      lng: parseFloat(suggestion.lon),
+      address: suggestion.display_name,
+    };
+    setLocation(loc);
+    setAddressInput(suggestion.display_name);
+    setShowSuggestions(false);
+    setAddressSuggestions([]);
+  };
+
+  // Debounce address search
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (addressInput) {
+        searchAddressSuggestions(addressInput);
+      }
+    }, 300);
+    return () => clearTimeout(timeoutId);
+  }, [addressInput]);
+
+  const handleAddressKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSuggestions || addressSuggestions.length === 0) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        setShowSuggestions(false);
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev =>
+          prev < addressSuggestions.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => (prev > 0 ? prev - 1 : -1));
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedSuggestionIndex >= 0 && selectedSuggestionIndex < addressSuggestions.length) {
+          selectAddress(addressSuggestions[selectedSuggestionIndex]);
+        }
+        break;
+      case 'Escape':
+        setShowSuggestions(false);
+        break;
+    }
+  };
 
   const toggleCuisine = (cuisine: string) => {
     setCuisines(prev =>
@@ -239,16 +362,71 @@ export default function PreferenceForm({
           </div>
 
           {/* Location */}
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-semibold text-gray-900">Location</p>
-                <p className="text-sm text-gray-600">
-                  {gettingLocation ? 'Getting location...' : location?.address || 'Unknown'}
-                </p>
-              </div>
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-3">
+              Location
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                value={addressInput}
+                onChange={(e) => setAddressInput(e.target.value)}
+                onKeyDown={handleAddressKeyDown}
+                onFocus={() => {
+                  if (addressSuggestions.length > 0) {
+                    setShowSuggestions(true);
+                  }
+                }}
+                onBlur={() => {
+                  // Delay to allow clicking on suggestions
+                  setTimeout(() => setShowSuggestions(false), 200);
+                }}
+                placeholder="Enter an address or use current location"
+                disabled={gettingLocation}
+                className="w-full px-4 py-3 pr-36 border-2 border-gray-300 rounded-lg focus:border-yelp-red focus:outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+              />
+              <button
+                type="button"
+                onClick={useCurrentLocation}
+                disabled={gettingLocation}
+                className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-yelp-red text-white text-sm font-medium rounded hover:bg-red-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-1 whitespace-nowrap"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                {gettingLocation ? 'Loading...' : 'Use Current'}
+              </button>
+
+              {/* Dropdown suggestions */}
+              {showSuggestions && addressSuggestions.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white border-2 border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  {addressSuggestions.map((suggestion, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => selectAddress(suggestion)}
+                      className={`w-full text-left px-4 py-3 hover:bg-gray-100 border-b border-gray-200 last:border-b-0 transition-colors ${
+                        index === selectedSuggestionIndex ? 'bg-gray-100' : ''
+                      }`}
+                    >
+                      <div className="flex items-start gap-2">
+                        <svg className="w-5 h-5 text-yelp-red shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span className="text-sm text-gray-800">{suggestion.display_name}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
+            {location && (
+              <p className="mt-2 text-xs text-gray-600">
+                <span className="font-medium">Current:</span> {location.address}
+              </p>
+            )}
           </div>
 
           {/* Submit */}

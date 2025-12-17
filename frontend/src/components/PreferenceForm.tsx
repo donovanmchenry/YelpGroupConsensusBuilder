@@ -27,6 +27,7 @@ export default function PreferenceForm({
   const [dietary, setDietary] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<number[]>([1, 2]);
   const [maxDistance, setMaxDistance] = useState(10);
+  const [minRating, setMinRating] = useState<number>(3);
   const [location, setLocation] = useState<{ lat: number; lng: number; address: string } | null>(null);
   const [addressInput, setAddressInput] = useState('');
   const [addressSuggestions, setAddressSuggestions] = useState<Array<{
@@ -223,6 +224,7 @@ export default function PreferenceForm({
         dietaryRestrictions: dietary,
         priceRange,
         maxDistance,
+        minRating,
       };
 
       await submitPreferences(sessionId, participantId, preferences);
@@ -340,6 +342,30 @@ export default function PreferenceForm({
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Minimum Rating */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              Minimum Rating: {minRating.toFixed(1)}
+              <span className="text-yellow-500">★</span>
+            </label>
+            <input
+              type="range"
+              min="1"
+              max="5"
+              step="0.1"
+              value={minRating}
+              onChange={(e) => setMinRating(parseFloat(e.target.value))}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-500"
+            />
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span className="flex items-center gap-1">1 <span className="text-yellow-500">★</span></span>
+              <span className="flex items-center gap-1">5 <span className="text-yellow-500">★</span></span>
+            </div>
+            <p className="mt-2 text-xs text-gray-500">
+              Only show restaurants with at least this rating
+            </p>
           </div>
 
           {/* Max Distance */}

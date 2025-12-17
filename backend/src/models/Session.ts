@@ -11,6 +11,7 @@ export interface UserPreference {
   dietaryRestrictions: string[];
   priceRange: number[];  // [1, 2] = $ or $$
   maxDistance: number;   // Miles
+  minRating?: number;    // Minimum star rating (3.0 - 5.0)
   partySize?: number;
   preferredDate?: string;
   preferredTime?: string;

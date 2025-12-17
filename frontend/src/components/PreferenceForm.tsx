@@ -27,6 +27,7 @@ export default function PreferenceForm({
   const [dietary, setDietary] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<number[]>([1, 2]);
   const [maxDistance, setMaxDistance] = useState(10);
+  const [minRating, setMinRating] = useState<number>(3.5);
   const [location, setLocation] = useState<{ lat: number; lng: number; address: string } | null>(null);
   const [addressInput, setAddressInput] = useState('');
   const [addressSuggestions, setAddressSuggestions] = useState<Array<{
@@ -223,6 +224,7 @@ export default function PreferenceForm({
         dietaryRestrictions: dietary,
         priceRange,
         maxDistance,
+        minRating,
       };
 
       await submitPreferences(sessionId, participantId, preferences);
@@ -340,6 +342,32 @@ export default function PreferenceForm({
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Minimum Rating */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-3">
+              Minimum Rating: {minRating} ★
+            </label>
+            <div className="flex gap-3">
+              {[3.0, 3.5, 4.0, 4.5].map(rating => (
+                <button
+                  key={rating}
+                  type="button"
+                  onClick={() => setMinRating(rating)}
+                  className={`flex-1 px-4 py-3 rounded-lg border-2 font-semibold transition-all ${
+                    minRating === rating
+                      ? 'border-yelp-red bg-yelp-red text-white'
+                      : 'border-gray-300 bg-white text-gray-700 hover:border-yelp-red'
+                  }`}
+                >
+                  {rating} ★
+                </button>
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-gray-500">
+              Only show restaurants with at least this rating
+            </p>
           </div>
 
           {/* Max Distance */}

@@ -26,20 +26,30 @@ class ConsensusService {
       return { results: [], chatId };
     }
 
-    // Step 4: Score each restaurant
-    const scored = businesses.map(business => ({
+    // Step 4: Filter by minimum rating if specified
+    const minRating = Math.max(...preferences.map(p => p.minRating || 0));
+    const filteredBusinesses = minRating > 0
+      ? businesses.filter(b => (b.rating || 0) >= minRating)
+      : businesses;
+
+    if (filteredBusinesses.length === 0) {
+      return { results: [], chatId };
+    }
+
+    // Step 5: Score each restaurant
+    const scored = filteredBusinesses.map(business => ({
       business,
       matchScore: this.calculateMatchScore(business, preferences),
       matchDetails: this.calculateMatchDetails(business, preferences),
       reasoningText: '', // Will be filled by AI
     }));
 
-    // Step 5: Sort by score and take top 5
+    // Step 6: Sort by score and take top 5
     const top5 = scored
       .sort((a, b) => b.matchScore - a.matchScore)
       .slice(0, 5);
 
-    // Step 6: Add AI reasoning for top matches
+    // Step 7: Add AI reasoning for top matches
     const withReasoning = await this.addAIReasoning(top5, groupRequirements, chatId);
 
     return { results: withReasoning, chatId };
@@ -325,8 +335,18 @@ class ConsensusService {
       return [];
     }
 
+    // Filter by minimum rating if specified
+    const minRating = Math.max(...preferences.map(p => p.minRating || 0));
+    const filteredBusinesses = minRating > 0
+      ? businesses.filter((b: any) => (b.rating || 0) >= minRating)
+      : businesses;
+
+    if (filteredBusinesses.length === 0) {
+      return [];
+    }
+
     // Score each restaurant
-    const scored = businesses.map((business: any) => ({
+    const scored = filteredBusinesses.map((business: any) => ({
       business,
       matchScore: this.calculateMatchScore(business, preferences),
       matchDetails: this.calculateMatchDetails(business, preferences),
@@ -364,8 +384,18 @@ class ConsensusService {
       return [];
     }
 
+    // Filter by minimum rating if specified
+    const minRating = Math.max(...preferences.map(p => p.minRating || 0));
+    const filteredBusinesses = minRating > 0
+      ? businesses.filter((b: any) => (b.rating || 0) >= minRating)
+      : businesses;
+
+    if (filteredBusinesses.length === 0) {
+      return [];
+    }
+
     // Score each restaurant
-    const scored = businesses.map((business: any) => ({
+    const scored = filteredBusinesses.map((business: any) => ({
       business,
       matchScore: this.calculateMatchScore(business, preferences),
       matchDetails: this.calculateMatchDetails(business, preferences),

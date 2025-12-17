@@ -11,6 +11,7 @@ export interface UserPreference {
   dietaryRestrictions: string[];
   priceRange: number[];
   maxDistance: number;
+  minRating?: number;
   partySize?: number;
   preferredDate?: string;
   preferredTime?: string;

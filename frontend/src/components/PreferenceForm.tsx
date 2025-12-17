@@ -27,7 +27,7 @@ export default function PreferenceForm({
   const [dietary, setDietary] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<number[]>([1, 2]);
   const [maxDistance, setMaxDistance] = useState(10);
-  const [minRating, setMinRating] = useState<number>(3.5);
+  const [minRating, setMinRating] = useState<number>(3);
   const [location, setLocation] = useState<{ lat: number; lng: number; address: string } | null>(null);
   const [addressInput, setAddressInput] = useState('');
   const [addressSuggestions, setAddressSuggestions] = useState<Array<{
@@ -346,24 +346,22 @@ export default function PreferenceForm({
 
           {/* Minimum Rating */}
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-3">
-              Minimum Rating: {minRating} ★
+            <label className="block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              Minimum Rating: {minRating.toFixed(1)}
+              <span className="text-yellow-500">★</span>
             </label>
-            <div className="flex gap-3">
-              {[3.0, 3.5, 4.0, 4.5].map(rating => (
-                <button
-                  key={rating}
-                  type="button"
-                  onClick={() => setMinRating(rating)}
-                  className={`flex-1 px-4 py-3 rounded-lg border-2 font-semibold transition-all ${
-                    minRating === rating
-                      ? 'border-yelp-red bg-yelp-red text-white'
-                      : 'border-gray-300 bg-white text-gray-700 hover:border-yelp-red'
-                  }`}
-                >
-                  {rating} ★
-                </button>
-              ))}
+            <input
+              type="range"
+              min="1"
+              max="5"
+              step="0.5"
+              value={minRating}
+              onChange={(e) => setMinRating(parseFloat(e.target.value))}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-500"
+            />
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span className="flex items-center gap-1">1 <span className="text-yellow-500">★</span></span>
+              <span className="flex items-center gap-1">5 <span className="text-yellow-500">★</span></span>
             </div>
             <p className="mt-2 text-xs text-gray-500">
               Only show restaurants with at least this rating

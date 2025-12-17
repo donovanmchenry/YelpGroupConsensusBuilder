@@ -354,7 +354,7 @@ export default function PreferenceForm({
               type="range"
               min="1"
               max="5"
-              step="0.5"
+              step="0.1"
               value={minRating}
               onChange={(e) => setMinRating(parseFloat(e.target.value))}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-500"

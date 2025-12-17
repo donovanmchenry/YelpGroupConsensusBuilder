@@ -148,7 +148,8 @@ This app demonstrates advanced Yelp AI API usage:
 
 MIT
 
-## 👤 Author
+## 👤 Authors
+Donovan McHenry, Nathan Bach
 
 Built for the Yelp AI API Hackathon 2025
 
